@@ -1,0 +1,146 @@
+<CustomDropDown>
+    Button:
+        text: "Item 1"
+        size_hint_y: None
+        height: 150
+        on_release: root.select("Item 1")
+
+    Button:
+        text: "Item 2"
+        size_hint_y: 0.1, 0.1
+        height: 150
+        on_release: root.select("Item 2")
+
+    Button:
+        text: "Item 3"
+        size_hint_y: 0.1, 0.1
+        height: 150
+        on_release: root.select("Item 3")
+
+<UploadTable>
+    GridLayout:
+        cols: 1
+        size: root.width, root.height
+
+        GridLayout:
+            cols: 2
+            size: root.width, root.height
+
+            Label:
+                text: 'Name of Dataset'
+
+            TextInput:
+                multiline: False
+                hint_text: 'Enter Text Here'
+
+            Label:
+                text: 'Numeric Matrix'
+
+            Button:
+                text: 'Upload File'
+
+            Label:
+                text: 'Row Annotations'
+
+            Button:
+                text: 'Upload File'
+
+            Label:
+                text: 'Column Annotations'
+
+            Button:
+                text: 'Upload File'
+
+        Button:
+            text: 'Upload'
+
+<ComparisonTable>
+    GridLayout:
+        cols: 1
+        size: root.width, root.height
+
+        Button:
+            text: 'Upload Table'
+
+        GridLayout:
+            cols: 2
+
+            Button:
+                text: 'Remove Row'
+
+            Button:
+                text: 'Remove Column'
+
+        GridLayout:
+            cols: 3
+
+            Label:
+                text: 'Main Comparison'
+
+            Label:
+                text: 'Subgroup Colour Code'
+
+            Button:
+                text: '+ Filter'
+
+            CustomDropDown:
+
+            CustomDropDown:
+
+            CustomDropDown:
+
+        Button:
+            text: 'Download Table'
+
+<CustomizeStats>
+    GridLayout:
+        cols: 2
+        size: root.width, root.height
+
+        Label:
+            id: correlation_label
+            text: 'Correlation Method'
+
+        Spinner:
+            id: correlation_spinner
+            text: 'Correlation Method'
+            values: ["Spearman", "Kendall", "Pearson"]
+            on_text: root.correlation_clicked(correlation_spinner.text)
+
+        Label:
+            id: test_label
+            text: 'Test Method'
+
+        Spinner:
+            id: test_spinner
+            text: 'Test Method'
+            values: ["Spearman", "Kendall", "Pearson"]
+            on_text: root.test_clicked(test_spinner.text)
+
+<KVTabLay>
+    TabbedPanel:
+        size: root.width, root.height
+        do_default_tab: False
+        tab_width: 300
+        tab_height: 75
+
+        TabbedPanelItem:
+            text: 'Upload Data'
+            UploadTable:
+
+        TabbedPanelItem:
+            text: 'Pick Comparisons'
+            ComparisonTable:
+
+        TabbedPanelItem:
+            text: 'Make Groups'
+
+        TabbedPanelItem:
+            text: 'Customize Colours'
+
+        TabbedPanelItem:
+            text: 'Customize Stats'
+            CustomizeStats:
+
+        TabbedPanelItem:
+            text: 'Data Explorer'
