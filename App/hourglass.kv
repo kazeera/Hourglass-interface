@@ -1,22 +1,3 @@
-<CustomDropDown>
-    Button:
-        text: "Item 1"
-        size_hint_y: None
-        height: 150
-        on_release: root.select("Item 1")
-
-    Button:
-        text: "Item 2"
-        size_hint_y: 0.1, 0.1
-        height: 150
-        on_release: root.select("Item 2")
-
-    Button:
-        text: "Item 3"
-        size_hint_y: 0.1, 0.1
-        height: 150
-        on_release: root.select("Item 3")
-
 <UploadTable>
     GridLayout:
         cols: 1
@@ -54,45 +35,39 @@
         Button:
             text: 'Upload'
 
-<ComparisonTable>
-    GridLayout:
-        cols: 1
-        size: root.width, root.height
+<ComparisonTable>:
+	GridLayout:
+		cols:1
 
-        Button:
-            text: 'Upload Table'
-
+		ScrollView:
+			GridLayout:
+				id: container
+				cols: 1
+				size_hint_y: None
+				height: self.minimum_height
+				row_force_default: True
+				row_default_height: dp(26)
         GridLayout:
-            cols: 2
-
+            cols:2
+		    Button:
+			    text: "Add a Comparison (row)"
+			    on_release: root.add_a_row()
             Button:
-                text: 'Remove Row'
+			    text: "Add filter"
 
-            Button:
-                text: 'Remove Column'
+<ComparisonTableRow>:
+    orientation: "horizontal"
 
-        GridLayout:
-            cols: 3
+    TextInput:
+        hint_text: "MainComparison"
+    TextInput:
+        hint_text: "Subgroup"
+    Button:
+        text: "+Filter"
+    Button:
+        text: "-"
 
-            Label:
-                text: 'Main Comparison'
-
-            Label:
-                text: 'Subgroup Colour Code'
-
-            Button:
-                text: '+ Filter'
-
-            CustomDropDown:
-
-            CustomDropDown:
-
-            CustomDropDown:
-
-        Button:
-            text: 'Download Table'
-
-<CustomizeStats>
+<AdvancedOptions>
     GridLayout:
         cols: 2
         size: root.width, root.height
@@ -140,7 +115,7 @@
 
         TabbedPanelItem:
             text: 'Customize Stats'
-            CustomizeStats:
+            AdvancedOptions:
 
         TabbedPanelItem:
             text: 'Data Explorer'
