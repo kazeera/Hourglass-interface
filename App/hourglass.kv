@@ -69,28 +69,82 @@
 
 <AdvancedOptions>
     GridLayout:
-        cols: 2
+        cols: 1
         size: root.width, root.height
 
-        Label:
-            id: correlation_label
-            text: 'Correlation Method'
+        GridLayout:
+            cols: 2
 
-        Spinner:
-            id: correlation_spinner
-            text: 'Correlation Method'
-            values: ["Spearman", "Kendall", "Pearson"]
-            on_text: root.correlation_clicked(correlation_spinner.text)
+            Label:
+                id: correlation_label
+                text: 'Correlation Method'
 
-        Label:
-            id: test_label
-            text: 'Test Method'
+            Spinner:
+                id: correlation_spinner
+                text: 'pearson'
+                values: ["pearson", "kendall", "spearman"]
+                on_text: root.correlation_clicked(correlation_spinner.text)
 
-        Spinner:
-            id: test_spinner
-            text: 'Test Method'
-            values: ["Spearman", "Kendall", "Pearson"]
-            on_text: root.test_clicked(test_spinner.text)
+            Label:
+                id: pvaltest_label
+                text: 'Test Method'
+
+            Spinner:
+                id: pvaltest_spinner
+                text: 't.test'
+                values: ["t.test", "wilcox"]
+                on_text: root.pvaltest_clicked(pvaltest_spinner.text)
+
+            Label:
+                id: pvallabel_label
+                text: 'P-values Label'
+
+            Spinner:
+                id: pvallabel_spinner
+                text: 'stars'
+                values: ["stars", "numbers"]
+                on_text: root.pvallabel_clicked(pvallabel_spinner.text)
+
+            CheckBox:
+                id: do_survival_analysis
+                active: False
+
+            Label:
+                text_size: self.size
+                halign: 'left'
+                text: 'Run survival analysis - pick columns from row annotations:'
+
+            Label:
+                text_size: self.size
+                halign: 'right'
+                text: 'Survival time column:'
+
+            Spinner:
+                text: 'Select'
+                values: ["Smoker", "Age", "Survival.Time", "OS.Status"] #TODO populate with column names of row annotations
+
+            Label:
+                text_size: self.size
+                halign: 'right'
+                text: 'Censoring status (1=censored, 2=dead) column:'
+
+            Spinner:
+                text: 'Select'
+                values: ["Smoker", "Age", "Survival.Time", "OS.Status"] #TODO populate with column names of row annotations
+
+        GridLayout:
+            cols: 3
+            CheckBox:
+                id: do_impute
+                active: True
+
+            Label:
+                text: 'Run imputed version in parallel - impute NAs % around mean = '
+
+            TextInput:
+                id: impute_with_mean
+                multiline: False
+                hint_text: 'Enter number between 0 and 100 here (inclusive). Default: 5'
 
 <KVTabLay>
     TabbedPanel:
@@ -114,8 +168,11 @@
             text: 'Customize Colours'
 
         TabbedPanelItem:
-            text: 'Customize Stats'
+            text: 'Advanced Options'
             AdvancedOptions:
 
         TabbedPanelItem:
             text: 'Data Explorer'
+		
+        TabbedPanelItem:
+            text: 'Run Hourglass'
