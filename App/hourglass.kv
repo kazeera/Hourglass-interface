@@ -45,6 +45,16 @@
         Button:
             text: 'Upload'
 
+<FileChooserPopup>
+
+    id: FileChooserPopup
+
+    FileChooserIconView:
+        id: FileChooser
+        pos_hint: {'x':0,'y':0}
+
+        on_selection: FileChooserPopup.selected(FileChooser.selection)
+
 <ComparisonTable>:
 	GridLayout:
 		cols:1
@@ -67,94 +77,194 @@
 
 <ComparisonTableRow>:
     orientation: "horizontal"
+    Spinner:
+        font_size: app.text_size
+        text: 'Main Comparison'
+        values: app.getRowAnnCols()
 
-    TextInput:
-        hint_text: "MainComparison"
-    TextInput:
-        hint_text: "Subgroup"
+    Spinner:
+        font_size: app.text_size
+        text: 'Subgroup'
+        values: app.getRowAnnCols()
+
+    # TextInput:
+    #    hint_text: "MainComparison"
+    # TextInput:
+    #    hint_text: "Subgroup"
     Button:
         text: "+Filter"
     Button:
         text: "-"
+
+<CustomCheckbox>
+    Label:
+    CheckBox:
+        active: root.check_box
+    Label:
+        font_size: app.text_size
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        text: root.label_text
+
+<CustomSpinner>
+    Label:
+        id: label
+        font_size: app.text_size
+        text_size: self.size
+        halign: 'right'
+        valign: 'middle'
+        text: root.label_text
+    AnchorLayout:
+        Spinner:
+            size_hint: .8, .4
+            id: spinner
+            font_size: app.text_size
+            text: root.initial_option
+            values: root.spinner_list
+            on_text: root.clicked(root.id_parameter, spinner.text)
 
 <AdvancedOptions>
     GridLayout:
         cols: 1
         size: root.width, root.height
 
+
+        CustomSpinner:
+            id_parameter: 'correlation_method'
+            label_text: 'Correlation Method'
+            initial_option: 'pearson'
+            spinner_list: ["pearson", "kendall", "spearman"]
+        CustomSpinner:
+            id_parameter: 'pval_test'
+            label_text: 'Test Method'
+            initial_option: 't.test'
+            spinner_list: ["t.test", "wilcox"]
+
+        CustomSpinner:
+            id_parameter: 'pval_label'
+            label_text: 'P-values Label'
+            initial_option: 'stars'
+            spinner_list: ["stars", "numbers"]
+
+
+        CustomSpinner:
+            id_parameter: 'paired_analysis_id'
+            label_text: 'Paired analysis column:'
+            spinner_list: app.getRowAnnCols()
+
+        CustomCheckbox:
+            id_parameter: 'do_survival_analysis'
+            label_text: 'Run survival analysis - pick columns from row annotations:'
+            check_box: False
+
+        CustomSpinner:
+            id_parameter: 'surv_time_column'
+            label_text: 'Survival time column:'
+            spinner_list: app.getRowAnnCols()
+
+        CustomSpinner:
+            id_parameter: 'surv_status_column'
+            label_text: 'Censoring status (1=censored, 2=dead) column:'
+            spinner_list: app.getRowAnnCols()
+
+        GridLayout:
+            cols: 2
+            CustomCheckbox:
+                id_parameter: 'do_impute'
+                label_text: 'Run imputed version in parallel - impute NAs % around mean = '
+                check_box: False
+            AnchorLayout:
+                TextInput:
+                    size_hint: .3, .3
+                    id: impute_with_mean
+                    multiline: False
+                    hint_text: 'Enter number between 0 and 100 \nhere (inclusive). Default: 5.'
+
+<RunHourglass>
+    GridLayout:
+        size: root.width, root.height
+        cols: 1
+
         GridLayout:
             cols: 2
 
+            CustomCheckbox:
+                label_text: 'Quality Control Plots:'
+                color: 1,0,1,1
+                check_box: False
             Label:
-                id: correlation_label
-                text: 'Correlation Method'
 
-            Spinner:
-                id: correlation_spinner
-                text: 'pearson'
-                values: ["pearson", "kendall", "spearman"]
-                on_text: root.correlation_clicked(correlation_spinner.text)
+            CustomSpinner:
+                id_parameter: 'colAnn1'
+                label_text: 'By.Parameter Column'
+                spinner_list: app.getColAnnCols() #TODO populate with column names of column annotations
 
-            Label:
-                id: pvaltest_label
-                text: 'Test Method'
-
-            Spinner:
-                id: pvaltest_spinner
-                text: 't.test'
-                values: ["t.test", "wilcox"]
-                on_text: root.pvaltest_clicked(pvaltest_spinner.text)
+            CustomSpinner:
+                id_parameter: 'colAnn2'
+                label_text: 'By.Feature Column'
+                spinner_list: app.getColAnnCols() #TODO populate with column names of column annotations
 
             Label:
-                id: pvallabel_label
-                text: 'P-values Label'
-
-            Spinner:
-                id: pvallabel_spinner
-                text: 'stars'
-                values: ["stars", "numbers"]
-                on_text: root.pvallabel_clicked(pvallabel_spinner.text)
-
-            CheckBox:
-                id: do_survival_analysis
-                active: False
+            Label:
 
             Label:
-                text_size: self.size
-                halign: 'left'
-                text: 'Run survival analysis - pick columns from row annotations:'
-
-            Label:
-                text_size: self.size
+                text: '"Make Groups" Plots only:'
                 halign: 'right'
-                text: 'Survival time column:'
+                font_size: app.text_size
+                # color: 1,0,1,1
+            Label:
 
-            Spinner:
-                text: 'Select'
-                values: ["Smoker", "Age", "Survival.Time", "OS.Status"] #TODO populate with column names of row annotations
+            CustomCheckbox:
+                label_text: 'Make individual boxplots'
+
+            CustomCheckbox:
+                label_text: 'Make overview boxplots'
+
+            CustomCheckbox:
+                label_text: 'Make heatmaps'
+
+            CustomCheckbox:
+                label_text: 'Make correlation plots'
+
+            CustomCheckbox:
+                label_text: 'Make correlation scatter plots (features < 50)'
+
+            CustomCheckbox:
+                label_text: 'Make individual correlation scatter plots (takes a long time)'
+                check_box: False
+
+            CustomCheckbox:
+                label_text: 'Make p-value/fold-change heatmap'
+
+            CustomCheckbox:
+                label_text: 'Make profile (stacked) barplots'
+
+            CustomCheckbox:
+                label_text: 'Make profile (stacked) barplots'
 
             Label:
-                text_size: self.size
-                halign: 'right'
-                text: 'Censoring status (1=censored, 2=dead) column:'
-
-            Spinner:
-                text: 'Select'
-                values: ["Smoker", "Age", "Survival.Time", "OS.Status"] #TODO populate with column names of row annotations
-
-        GridLayout:
-            cols: 3
-            CheckBox:
-                id: do_impute
-                active: True
-
             Label:
-                text: 'Run imputed version in parallel - impute NAs % around mean = '
+            Button:
+                text: 'Download hourglass settings'
 
-            TextInput:
-                id: impute_with_mean
-                multiline: False
-                hint_text: 'Enter number between 0 and 100 here (inclusive). Default: 5'
+        AnchorLayout:
+            Button:
+                size_hint: .5, .5
+                text: 'Run hourglass'
+                font_size: app.text_size
+                # background_color: [1, 1, 1, 0.4]
+
+<MakeGroups>
+    TabbedPanel:
+        size: root.width, root.height
+        do_default_tab: False
+        tab_width: 300
+
+        TabbedPanelItem:
+            text: '1. Name Groups'
+        TabbedPanelItem:
+            text: '2. Pick Relevant Features and Parameters'
 
 <KVTabLay>
     TabbedPanel:
@@ -173,6 +283,7 @@
 
         TabbedPanelItem:
             text: 'Make Groups'
+            MakeGroups:
 
         TabbedPanelItem:
             text: 'Customize Colours'
@@ -183,16 +294,7 @@
 
         TabbedPanelItem:
             text: 'Data Explorer'
-		
+
         TabbedPanelItem:
             text: 'Run Hourglass'
-
-<FileChooserPopup>
-
-    id: FileChooserPopup
-
-    FileChooserIconView:
-        id: FileChooser
-        pos_hint: {'x':0,'y':0}
-
-        on_selection: FileChooserPopup.selected(FileChooser.selection)
+            RunHourglass:
