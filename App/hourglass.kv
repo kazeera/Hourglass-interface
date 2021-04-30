@@ -8,6 +8,7 @@
             size: root.width, root.height
 
             Label:
+                id: datasetName
                 text: 'Name of Dataset'
 
             TextInput:
@@ -18,19 +19,28 @@
                 text: 'Numeric Matrix'
 
             Button:
+                id: NumMatButton
                 text: 'Upload File'
+                on_press: root.popup_opener()
+                on_release: root.button_changer('NumMatButton')
 
             Label:
                 text: 'Row Annotations'
 
             Button:
+                id: RowAnnButton
                 text: 'Upload File'
+                on_press: root.popup_opener()
+                on_release: root.button_changer('RowAnnButton')
 
             Label:
                 text: 'Column Annotations'
 
             Button:
+                id: ColAnnButton
                 text: 'Upload File'
+                on_press: root.popup_opener()
+                on_release: root.button_changer('ColAnnButton')
 
         Button:
             text: 'Upload'
@@ -176,3 +186,13 @@
 		
         TabbedPanelItem:
             text: 'Run Hourglass'
+
+<FileChooserPopup>
+
+    id: FileChooserPopup
+
+    FileChooserIconView:
+        id: FileChooser
+        pos_hint: {'x':0,'y':0}
+
+        on_selection: FileChooserPopup.selected(FileChooser.selection)
