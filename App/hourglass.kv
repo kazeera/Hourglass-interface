@@ -5,7 +5,6 @@
 
         GridLayout:
             cols: 2
-            size: root.width, root.height
 
             Label:
                 id: datasetName
@@ -15,45 +14,58 @@
                 multiline: False
                 hint_text: 'Enter Text Here'
 
-            Label:
-                text: 'Numeric Matrix'
+        UploadFilePopup:
+            id_parameter: 'filepath_matrix'
+            label_text: 'Numeric Matrix\nRows (samples) x columns (genes/features/parameters)'
 
+        UploadFilePopup:
+            id_parameter: 'filepath_rowann'
+            label_text: 'Row Annotations\nFirst column must be row names of numeric matrix.'
+
+        UploadFilePopup:
+            id_parameter: 'filepath_colann'
+            label_text: 'Column Annotations\nOptional. First column must be column names of numeric matrix.'
+
+<UploadFilePopup>
+    id: root.id_parameter
+
+    Label:
+        text_size: self.size
+        # font_size: app.text_size
+        halign: 'center'
+        valign: 'middle'
+        text: root.label_text
+    Button:
+        id: upload_button
+        text: root.button_text
+        font_size: app.text_size
+        on_press: root.open_popup()
+
+<FileChoosePopup>:
+    title: "Choose a .CSV File"
+    size_hint: .9, .9
+    auto_dismiss: False
+
+    BoxLayout:
+        orientation: "vertical"
+        FileChooser:
+            id: filechooser
+            FileChooserIconLayout
+
+        BoxLayout:
+            size_hint: (1, 0.1)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            spacing: 20
             Button:
-                id: NumMatButton
-                text: 'Upload File'
-                on_press: root.popup_opener()
-                on_release: root.button_changer('NumMatButton')
-
-            Label:
-                text: 'Row Annotations'
-
+                text: "Cancel"
+                on_release: root.dismiss()
             Button:
-                id: RowAnnButton
-                text: 'Upload File'
-                on_press: root.popup_opener()
-                on_release: root.button_changer('RowAnnButton')
+                text: "Load"
+                on_release: root.load(filechooser.selection)
+                id: ldbtn
+                disabled: True if filechooser.selection==[] else False
 
-            Label:
-                text: 'Column Annotations'
 
-            Button:
-                id: ColAnnButton
-                text: 'Upload File'
-                on_press: root.popup_opener()
-                on_release: root.button_changer('ColAnnButton')
-
-        Button:
-            text: 'Upload'
-
-<FileChooserPopup>
-
-    id: FileChooserPopup
-
-    FileChooserIconView:
-        id: FileChooser
-        pos_hint: {'x':0,'y':0}
-
-        on_selection: FileChooserPopup.selected(FileChooser.selection)
 
 <ComparisonTable>:
 	GridLayout:
@@ -87,10 +99,6 @@
         text: 'Subgroup'
         values: app.getRowAnnCols()
 
-    # TextInput:
-    #    hint_text: "MainComparison"
-    # TextInput:
-    #    hint_text: "Subgroup"
     Button:
         text: "+Filter"
     Button:
@@ -102,6 +110,7 @@
         active: root.check_box
     Label:
         font_size: app.text_size
+        size_hint_x: 0.6
         text_size: self.size
         halign: 'left'
         valign: 'middle'

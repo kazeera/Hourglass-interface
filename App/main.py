@@ -12,42 +12,50 @@ from kivy.uix.checkbox import CheckBox
 from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, ListProperty
 
+class hourglassParameters():
+    name = None
+    filepath_matrix = None  # numeric matrix
+    filepath_rowAnn = None  # describes rows of matrix
+    filepath_colAnn = None  # describes columns of matrix
+    comparisons_table = None
+    correlation_method = None
+
+    NumericMatrix = ""
+    RowAnn = ""
+    ColAnn = ""
+
+    def __init__(self):
+        pass
+
+
 # Upload Files ---
 class UploadTable(Widget):
-    def popup_opener(self):
-        open_popup()
+    pass
 
-    def button_changer(self, key):
-        if key == 'NumMatButton':
-            self.ids.NumMatButton.text = f'{NumericMatrix}'
-        if key == 'RowAnnButton':
-            self.ids.RowAnnButton.text = f'{RowAnn}'
-        if key == 'ColAnnButton':
-            self.ids.ColAnnButton.text = f'{ColAnn}'
+class FileChoosePopup(Popup):
+    load = ObjectProperty()
 
-class FileChooserPopup(FloatLayout):
-    global NumericMatrix
-    global RowAnn
-    global ColAnn
+class UploadFilePopup(BoxLayout):
+    button_text = StringProperty('Choose File')
+    file_path = StringProperty("No file chosen")
+    label_text = StringProperty("File: ")
+    the_popup = ObjectProperty(None)
+    id_parameter = StringProperty()
 
-    NumericMatrix = StringProperty()
-    RowAnn = StringProperty()
-    ColAnn = StringProperty()
+    def open_popup(self):
+        self.the_popup = FileChoosePopup(load=self.load)
+        self.the_popup.open()
 
-    def selected(self, filepath): #pass button id?
-        NumericMatrix = filepath[0]
-        print(NumericMatrix)
-        close_popup()
+    def load(self, selection):
+        self.file_path = str(selection[0])
+        self.the_popup.dismiss()
 
-def open_popup():
-    file_chooser = FileChooserPopup()
-    global popup_window
-    popup_window = Popup(title='Upload a File', content=file_chooser, size_hint=(0.75, 0.75), auto_dismiss=False)
-    popup_window.open()
+        # check for non-empty list i.e. file selected
+        if self.file_path:
+            self.ids.upload_button.text = self.file_path
 
+        print_hourglass_parameter(self.id_parameter, self.file_path) # TODO we can update our dataset object here
 
-def close_popup():
-    popup_window.dismiss()
 
 # Comparisons Table ---
 class ComparisonTableRow(BoxLayout):
@@ -100,20 +108,6 @@ class RunHourglass(Widget):
         pass # button to  interface with R, pass hourglass parameters, table and data filepaths
 
 
-class hourglassParameters():
-    name = None
-    filepath_matrix = None  # numeric matrix
-    filepath_rowAnn = None  # describes rows of matrix
-    filepath_colAnn = None  # describes columns of matrix
-    comparisons_table = None
-    correlation_method = None
-
-    def __init__(self):
-        pass
-
-    def update(self, key, value):
-        if key == "filepath_matrix":
-            self.filepath_matrix = value
 
 def print_hourglass_parameter(key, value):
     print(key, ":", value)
@@ -122,13 +116,20 @@ class KVTabLay(Widget):
     pass
 
 class HourglassApp(App):
+    name = None
+    filepath_matrix = None  # numeric matrix
+    filepath_rowAnn = None  # describes rows of matrix
+    filepath_colAnn = None  # describes columns of matrix
+    comparisons_table = None
+    correlation_method = None
+
+    text_size = 19
+
     def getRowAnnCols(self):
         return ["", "Smoker", "Age", "Survival.Time", "OS.Status"]
 
     def getColAnnCols(self):
         return ["GeneSym", "GeneID", "Parameter"]
-
-    text_size = 19
 
     def build(self):
         return KVTabLay()
