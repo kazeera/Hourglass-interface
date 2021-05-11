@@ -7,10 +7,10 @@
             cols: 2
 
             Label:
-                id: datasetName
                 text: 'Name of Dataset'
 
             TextInput:
+                id: datasetName
                 multiline: False
                 hint_text: 'Enter Text Here'
 
@@ -42,7 +42,7 @@
         on_press: root.open_popup()
 
 <FileChoosePopup>:
-    title: "Choose a .CSV File"
+    title: "Choose a file"
     size_hint: .9, .9
     auto_dismiss: False
 

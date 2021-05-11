@@ -11,6 +11,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, ListProperty
+import pandas as pd
+import numpy as np
+from functions import *
 
 class hourglassParameters():
     name = None
@@ -27,9 +30,21 @@ class hourglassParameters():
     def __init__(self):
         pass
 
+class Dataset:
+    name = None
+    mat = None  # numeric matrix
+    rowAnn = None  # describes rows of matrix
+    colAnn = None  # describes columns of matrix
+
+    def __init__(self):
+        pass
+
+p = hourglassParameters()
+ds = Dataset()
 
 # Upload Files ---
 class UploadTable(Widget):
+    # ds.name = self.ids.datasetName
     pass
 
 class FileChoosePopup(Popup):
@@ -54,6 +69,12 @@ class UploadFilePopup(BoxLayout):
         if self.file_path:
             self.ids.upload_button.text = self.file_path
 
+        # Update parameter class
+        if self.id_parameter == "filepath_matrix":
+            p.filepath_matrix = self.file_path
+            ds.mat = read_tbl(self.file_path)
+
+        ## Update dataset object
         print_hourglass_parameter(self.id_parameter, self.file_path) # TODO we can update our dataset object here
 
 
@@ -103,6 +124,7 @@ class AdvancedOptions(Widget):
     def pvallabel_clicked(self, value):
         self.pvallabel = f'{value}'
         # self.ids.pvallabel_label.text = f'{value}'
+
 class RunHourglass(Widget):
     def runHourglass(self):
         pass # button to  interface with R, pass hourglass parameters, table and data filepaths
@@ -115,20 +137,15 @@ def print_hourglass_parameter(key, value):
 class KVTabLay(Widget):
     pass
 
-class HourglassApp(App):
-    name = None
-    filepath_matrix = None  # numeric matrix
-    filepath_rowAnn = None  # describes rows of matrix
-    filepath_colAnn = None  # describes columns of matrix
-    comparisons_table = None
-    correlation_method = None
 
+class HourglassApp(App):
     text_size = 19
 
     def getRowAnnCols(self):
         return ["", "Smoker", "Age", "Survival.Time", "OS.Status"]
 
     def getColAnnCols(self):
+        # return pd.ds.colAnn.columns
         return ["GeneSym", "GeneID", "Parameter"]
 
     def build(self):
