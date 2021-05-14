@@ -17,14 +17,17 @@
         UploadFilePopup:
             id_parameter: 'filepath_matrix'
             label_text: 'Numeric Matrix\nRows (samples) x columns (genes/features/parameters)'
+            current_button: 'matrix'
 
         UploadFilePopup:
             id_parameter: 'filepath_rowann'
             label_text: 'Row Annotations\nFirst column must be row names of numeric matrix.'
+            current_button: 'rowAnn'
 
         UploadFilePopup:
             id_parameter: 'filepath_colann'
             label_text: 'Column Annotations\nOptional. First column must be column names of numeric matrix.'
+            current_button: 'colAnn'
 
 <UploadFilePopup>
     id: root.id_parameter
@@ -40,6 +43,7 @@
         text: root.button_text
         font_size: app.text_size
         on_press: root.open_popup()
+        on_press: root.whats_the_button(root.current_button)
 
 <FileChoosePopup>:
     title: "Choose a file"
@@ -50,6 +54,7 @@
         orientation: "vertical"
         FileChooser:
             id: filechooser
+            on_selection: root.load(filechooser.selection)
             FileChooserIconLayout
 
         BoxLayout:
@@ -59,13 +64,6 @@
             Button:
                 text: "Cancel"
                 on_release: root.dismiss()
-            Button:
-                text: "Load"
-                on_release: root.load(filechooser.selection)
-                id: ldbtn
-                disabled: True if filechooser.selection==[] else False
-
-
 
 <ComparisonTable>:
 	GridLayout:

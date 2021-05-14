@@ -65,18 +65,42 @@ class UploadFilePopup(BoxLayout):
         self.file_path = str(selection[0])
         self.the_popup.dismiss()
 
-        # check for non-empty list i.e. file selected
+        # check for non-empty list i.e. file selected and change button text
         if self.file_path:
             self.ids.upload_button.text = self.file_path
+            print(currentButton)
+
+        # Update global variable containing
+        if currentButton == 'filepath_matrix':
+            global NumericMatrix
+            NumericMatrix = self.file_path
+        if currentButton == 'filepath_rowann':
+            global RowAnn
+            RowAnn = self.file_path
+        if currentButton == 'filepath_colann':
+            global ColAnn
+            ColAnn = self.file_path
 
         # Update parameter class
         if self.id_parameter == "filepath_matrix":
             p.filepath_matrix = self.file_path
             ds.mat = read_tbl(self.file_path)
+        if self.id_parameter == "filepath_rowann":
+            p.filepath_rowann = self.file_path
+            ds.rowAnn = read_tbl(self.file_path)
+        if self.id_parameter == "filepath_matrix":
+            p.filepath_matrix = self.file_path
+            ds.colAnn = read_tbl(self.file_path)
 
         ## Update dataset object
         print_hourglass_parameter(self.id_parameter, self.file_path) # TODO we can update our dataset object here
 
+    global currentButton
+    currentButton = 'String'
+
+    def whats_the_button(self, button):
+        global currentButton
+        currentButton = button
 
 # Comparisons Table ---
 class ComparisonTableRow(BoxLayout):
