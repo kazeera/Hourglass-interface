@@ -78,13 +78,16 @@
         GridLayout:
             cols:2
 		    Button:
-			    text: "Add a comparison (row)"
-			    on_release: root.add_a_row()
-            Button:
-			    text: "Remove first comparison (row)"
-			    on_release: root.remove_a_row2()
+			      text: "Add a comparison (row)"
+			      on_release: root.add_a_row()
+        Button:
+			      text: "Remove first comparison (row)"
+			      on_release: root.remove_a_row2()
 
 <ComparisonTableRow>:
+
+    id: id_number
+
     orientation: "horizontal"
     id: id_number2
 
@@ -119,6 +122,9 @@
         multiline: False
         on_text: root.update_row_info()
 
+    Button:
+        text: root.id_number2
+        on_press: root.remove_a_row()
 
 <CustomCheckbox>
     Label:
@@ -173,11 +179,11 @@
             initial_option: 'stars'
             spinner_list: ["stars", "numbers"]
 
-
         CustomSpinner:
             id_parameter: 'paired_analysis_id'
             label_text: 'Paired analysis column:'
             spinner_list: app.getRowAnnCols()
+            text_autoupdate: True
 
         CustomCheckbox:
             id_parameter: 'do_survival_analysis'
@@ -285,12 +291,15 @@
     TabbedPanel:
         size: root.width, root.height
         do_default_tab: False
-        tab_width: 300
+        tab_width: 500
 
         TabbedPanelItem:
             text: '1. Name Groups'
+            Spinner:
         TabbedPanelItem:
             text: '2. Pick Relevant Features and Parameters'
+        TabbedPanelItem:
+            text: '3. Make Supergroups'
 
 <KVTabLay>
     TabbedPanel:
@@ -300,12 +309,12 @@
         tab_height: 75
 
         TabbedPanelItem:
-            text: 'Upload Data'
-            UploadTable:
-
-        TabbedPanelItem:
             text: 'Pick Comparisons'
             ComparisonTable:
+
+        TabbedPanelItem:
+            text: 'Upload Data'
+            UploadTable:
 
         TabbedPanelItem:
             text: 'Make Groups'

@@ -27,7 +27,7 @@ class hourglassParameters():
     filepath_colAnn = None  # describes columns of matrix
     comparisons_table = None
     correlation_method = None
-
+    
     def __init__(self):
         pass
 
@@ -44,6 +44,7 @@ p = hourglassParameters()
 ds = Dataset()
 dill.load_session("dataset.pkl")
 # list(set(ds.rowAnn["Smoker"]))
+
 
 # Upload Files ---
 class UploadTable(Widget):
@@ -95,11 +96,13 @@ class UploadFilePopup(BoxLayout):
 
 # Comparisons Table ---
 class ComparisonTable(BoxLayout):
+
     comp_table2 = ObjectProperty()
     id_number = -1
     # Initialize list
     row_list = []
     row_info_list = []
+
     def add_a_row(self):
         # Update ID number
         self.id_number += 1
@@ -108,6 +111,7 @@ class ComparisonTable(BoxLayout):
         # Add to list of ComparisonTableRow objects
         self.row_list.append(curr_row)
         # Add row widget
+
         self.ids.container.add_widget(curr_row)
         # # Make a list of dict objects (dict object = row info)
         self.row_info_list.append({'MainComparison': "NA", 'Subtype': "NA", 'CustomComparison': "NA", 'Filter': "NA"})
@@ -119,6 +123,7 @@ class ComparisonTable(BoxLayout):
 
 class ComparisonTableRow(BoxLayout):
     id_number2 = StringProperty()
+
 
     def update_row_info(self):
         key_vals = {'MainComparison': self.ids.main_comparison.text,
@@ -195,15 +200,17 @@ class HourglassApp(App):
 
     def getRowAnnCols(self):
         if ds.rowAnn is None:
-            return ""
+
+            return ''
         else:
-            return [""] + list(ds.rowAnn.columns.values)  # ["", "Smoker", "Age", "Survival.Time", "OS.Status"]
+            return [""] + list(ds.rowAnn.columns.values)
 
     def getColAnnCols(self):
-        if ds.rowAnn is None:
-            return ""
+        if ds.colAnn is None:
+            return ''
         else:
-            return [""] + list(ds.colAnn.columns.values)  # ["GeneSym", "GeneID", "Parameter"]
+            return [""] + list(ds.colAnn.columns.values)
+
 
     def build(self):
         return KVTabLay()
