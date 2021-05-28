@@ -17,17 +17,14 @@
         UploadFilePopup:
             id_parameter: 'filepath_matrix'
             label_text: 'Numeric Matrix\nRows (samples) x columns (genes/features/parameters)'
-            current_button: 'matrix'
 
         UploadFilePopup:
             id_parameter: 'filepath_rowann'
             label_text: 'Row Annotations\nFirst column must be row names of numeric matrix.'
-            current_button: 'rowAnn'
 
         UploadFilePopup:
             id_parameter: 'filepath_colann'
             label_text: 'Column Annotations\nOptional. First column must be column names of numeric matrix.'
-            current_button: 'colAnn'
 
 <UploadFilePopup>
     id: root.id_parameter
@@ -43,7 +40,7 @@
         text: root.button_text
         font_size: app.text_size
         on_press: root.open_popup()
-        on_press: root.whats_the_button(root.current_button)
+        on_press: root.whats_the_button(root.id_parameter)
 
 <FileChoosePopup>:
     title: "Choose a file"
@@ -68,7 +65,8 @@
 <ComparisonTable>:
 	GridLayout:
 		cols:1
-
+        Label:
+            text: "Custom Comparison = Filter by column name of feature/gene from numeric matrix table. We recommend copying and pasting directly to avoid misspellings."
 		ScrollView:
 			GridLayout:
 				id: container
@@ -80,27 +78,47 @@
         GridLayout:
             cols:2
 		    Button:
-			    text: "Add a Comparison (row)"
+			    text: "Add a comparison (row)"
 			    on_release: root.add_a_row()
             Button:
-			    text: "Add filter"
+			    text: "Remove first comparison (row)"
+			    on_release: root.remove_a_row2()
 
 <ComparisonTableRow>:
     orientation: "horizontal"
-    Spinner:
-        font_size: app.text_size
-        text: 'Main Comparison'
-        values: app.getRowAnnCols()
+    id: id_number2
+
+    Label:
+        # id: id_number2
+        text: root.id_number2
+        # on_press: root.remove_a_row()
 
     Spinner:
+        id: main_comparison
+        font_size: app.text_size
+        values: app.getRowAnnCols()
+        text: 'Main Comparison'
+        on_text: root.update_row_info()
+
+    Spinner:
+        id: subgroup
         font_size: app.text_size
         text: 'Subgroup'
         values: app.getRowAnnCols()
+        on_text: root.update_row_info()
 
-    Button:
-        text: "+Filter"
-    Button:
-        text: "-"
+    TextInput:
+        id: custom_comparison
+        hint_text: "Custom Comparison"
+        multiline: False
+        on_text: root.update_row_info()
+
+    TextInput:
+        id: filter
+        hint_text: "Filter"
+        multiline: False
+        on_text: root.update_row_info()
+
 
 <CustomCheckbox>
     Label:
@@ -129,6 +147,7 @@
             font_size: app.text_size
             text: root.initial_option
             values: root.spinner_list
+            text_autoupdate: True
             on_text: root.clicked(root.id_parameter, spinner.text)
 
 <AdvancedOptions>
@@ -136,12 +155,12 @@
         cols: 1
         size: root.width, root.height
 
-
         CustomSpinner:
             id_parameter: 'correlation_method'
             label_text: 'Correlation Method'
             initial_option: 'pearson'
             spinner_list: ["pearson", "kendall", "spearman"]
+
         CustomSpinner:
             id_parameter: 'pval_test'
             label_text: 'Test Method'
