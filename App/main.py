@@ -10,9 +10,10 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.popup import Popup
-from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, ListProperty
+from kivy.properties import ObjectProperty, StringProperty, BooleanProperty, ListProperty, NumericProperty
 import pandas as pd
 import numpy as np
+import dill
 from functions import *
 
 class hourglassParameters():
@@ -23,9 +24,9 @@ class hourglassParameters():
     comparisons_table = None
     correlation_method = None
 
-    NumericMatrix = ""
-    RowAnn = ""
-    ColAnn = ""
+    # NumericMatrix = ""
+    # RowAnn = ""
+    # ColAnn = ""
 
     def __init__(self):
         pass
@@ -41,6 +42,9 @@ class Dataset:
 
 p = hourglassParameters()
 ds = Dataset()
+dill.load_session('dataset.pkl')
+list(set(ds.rowAnn["Smoker"]))
+
 
 # Upload Files ---
 class UploadTable(Widget):
@@ -71,15 +75,15 @@ class UploadFilePopup(BoxLayout):
             print(currentButton)
 
         # Update global variable containing
-        if currentButton == 'filepath_matrix':
-            global NumericMatrix
-            NumericMatrix = self.file_path
-        if currentButton == 'filepath_rowann':
-            global RowAnn
-            RowAnn = self.file_path
-        if currentButton == 'filepath_colann':
-            global ColAnn
-            ColAnn = self.file_path
+        # if currentButton == 'filepath_matrix':
+        #     global NumericMatrix
+        #     NumericMatrix = self.file_path
+        # if currentButton == 'filepath_rowann':
+        #     global RowAnn
+        #     RowAnn = self.file_path
+        # if currentButton == 'filepath_colann':
+        #     global ColAnn
+        #     ColAnn = self.file_path
 
         # Update parameter class
         if self.id_parameter == "filepath_matrix":
@@ -103,12 +107,60 @@ class UploadFilePopup(BoxLayout):
         currentButton = button
 
 # Comparisons Table ---
-class ComparisonTableRow(BoxLayout):
-    pass
-
 class ComparisonTable(BoxLayout):
+    id_number = -1
+    # container = GridLayout()
+    # Initialize list
+    row_list = []
+
     def add_a_row(self):
-        self.ids.container.add_widget(ComparisonTableRow())
+        # Update ID number
+        self.id_number += 1
+        # Make current row
+        curr_row = ComparisonTableRow(id_number2=str(self.id_number))
+        # Add to list of ComparisonTableRow objects
+        self.row_list.append(curr_row)
+        # Add row widget
+        for i in range(len(self.row_list)):
+            self.ids.container.remove_widget(self.row_list[i])
+        for i in range(len(self.row_list)):
+            self.ids.container.add_widget(self.row_list[i])
+
+    def remove_a_row2(self):
+        self.ids.container.remove_widget(self.row_list[1])
+        # for i in range(len(self.row_list)):
+        #     self.ids.container.remove_widget(self.row_list[i])
+        del self.row_list[1]
+        # for i in range(len(self.row_list)):
+        #     self.ids.container.add_widget(self.row_list[i])
+        print(ComparisonTable.row_list)
+        print(self.row_list)
+
+    # def redraw_list(self):
+    #     for i in range(len(self.row_list)):
+    #         self.ids.container.remove_widget(self.row_list[i])
+    #     for i in range(len(self.row_list)):
+    #         self.ids.container.add_widget(self.row_list[i])
+    #     print(ComparisonTable.row_list)
+
+class ComparisonTableRow(BoxLayout):
+    id_number2 = StringProperty()
+
+    def current_row(self):
+        print(self.id_number2)
+        print(self.ids.main_comparison.text)
+        print(self.ids.subgroup.text)
+        print(self.ids.filter.text)
+
+    def remove_a_row(self):
+        # ComparisonTable.ids.container.remove_widget(ComparisonTable.row_list[int(self.id_number2)])
+        # del ComparisonTable.row_list[self.id_number2]
+        ComparisonTable.remove_a_row2(root.ComparisonTable.id_number)
+        # ComparisonTable.remove_a_row2(ComparisonTable(), int(self.id_number2))
+
+
+
+
 
 # Make Groups ---
 class MakeGroups(Widget):
@@ -166,11 +218,16 @@ class HourglassApp(App):
     text_size = 19
 
     def getRowAnnCols(self):
-        return ["", "Smoker", "Age", "Survival.Time", "OS.Status"]
+        if ds.rowAnn is None:
+            return ''
+        else:
+            return [""] + list(ds.rowAnn.columns.values)
 
     def getColAnnCols(self):
-        # return pd.ds.colAnn.columns
-        return ["GeneSym", "GeneID", "Parameter"]
+        if ds.colAnn is None:
+            return ''
+        else:
+            return [""] + list(ds.colAnn.columns.values)
 
     def build(self):
         return KVTabLay()
