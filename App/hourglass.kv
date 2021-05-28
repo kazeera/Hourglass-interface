@@ -65,7 +65,8 @@
 <ComparisonTable>:
 	GridLayout:
 		cols:1
-
+        Label:
+            text: "Custom Comparison = Filter by column name of feature/gene from numeric matrix table. We recommend copying and pasting directly to avoid misspellings."
 		ScrollView:
 			GridLayout:
 				id: container
@@ -77,29 +78,50 @@
         GridLayout:
             cols:2
 		    Button:
-			    text: "Add a Comparison (row)"
-			    on_release: root.add_a_row()
-            Button:
-			    text: "Remove a Comparison (row)"
-			    on_release: root.remove_a_row2()
+			      text: "Add a comparison (row)"
+			      on_release: root.add_a_row()
+        Button:
+			      text: "Remove first comparison (row)"
+			      on_release: root.remove_a_row2()
 
 <ComparisonTableRow>:
 
     id: id_number
 
     orientation: "horizontal"
-    Spinner:
-        font_size: app.text_size
-        text: 'Main Comparison'
-        values: app.getRowAnnCols()
+    id: id_number2
+
+    Label:
+        # id: id_number2
+        text: root.id_number2
+        # on_press: root.remove_a_row()
 
     Spinner:
+        id: main_comparison
+        font_size: app.text_size
+        values: app.getRowAnnCols()
+        text: 'Main Comparison'
+        on_text: root.update_row_info()
+
+    Spinner:
+        id: subgroup
         font_size: app.text_size
         text: 'Subgroup'
         values: app.getRowAnnCols()
+        on_text: root.update_row_info()
 
     TextInput:
-        text_hint: "Filter"
+        id: custom_comparison
+        hint_text: "Custom Comparison"
+        multiline: False
+        on_text: root.update_row_info()
+
+    TextInput:
+        id: filter
+        hint_text: "Filter"
+        multiline: False
+        on_text: root.update_row_info()
+
     Button:
         text: root.id_number2
         on_press: root.remove_a_row()
@@ -131,13 +153,13 @@
             font_size: app.text_size
             text: root.initial_option
             values: root.spinner_list
+            text_autoupdate: True
             on_text: root.clicked(root.id_parameter, spinner.text)
 
 <AdvancedOptions>
     GridLayout:
         cols: 1
         size: root.width, root.height
-
 
         CustomSpinner:
             id_parameter: 'correlation_method'
