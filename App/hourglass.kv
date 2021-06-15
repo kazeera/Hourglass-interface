@@ -135,6 +135,7 @@
 
 <CCButton> # todo If this is a BoxLayout, add a Button
     Button:
+        id: color_button
         font_size: app.text_size
         size: 200, 50
         text: root.rowAnn_val
@@ -147,7 +148,6 @@
     viewclass: 'CCBoxlayout'
 
     RecycleBoxLayout:
-        id: layout
         size_hint_y: None
         height: self.minimum_height
         orientation: 'vertical'
