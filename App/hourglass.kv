@@ -119,6 +119,56 @@
         multiline: False
         on_text: root.update_row_info()
 
+<CCBoxlayout>
+    orientation: "horizontal"
+
+    Label:
+        text: root.rowAnn_col
+        size: 200, 50
+        size_hint: None, None
+
+    CCButton:
+        rowAnn_val: 'Value1'
+
+    CCButton:
+        rowAnn_val: 'Value2'
+
+<CCButton> # todo If this is a BoxLayout, add a Button
+    Button:
+        font_size: app.text_size
+        size: 200, 50
+        text: root.rowAnn_val
+        size_hint: None, None
+        background_normal: ''
+        background_color: root.button_color
+        on_press: root.open_popup()
+
+<CustomizeColors>
+    viewclass: 'CCBoxlayout'
+
+    RecycleBoxLayout:
+        id: layout
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+
+<ColorPopup>:
+    title: 'Pick a Color'
+    size_hint: .9, .9
+    id: popupcolor
+    auto_dismiss: False
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        ColorPicker:
+            id: colorpicker
+            size_hint: 1.0, 1.0
+
+        Button:
+            text: 'Select and Close Window'
+            size_hint: 1.0, 0.2
+            on_press: root.load(colorpicker)
 
 <CustomCheckbox>
     Label:
@@ -300,6 +350,10 @@
         tab_height: 75
 
         TabbedPanelItem:
+            text: 'Customize Colours'
+            CustomizeColors:
+
+        TabbedPanelItem:
             text: 'Upload Data'
             UploadTable:
 
@@ -310,9 +364,6 @@
         TabbedPanelItem:
             text: 'Make Groups'
             MakeGroups:
-
-        TabbedPanelItem:
-            text: 'Customize Colours'
 
         TabbedPanelItem:
             text: 'Advanced Options'

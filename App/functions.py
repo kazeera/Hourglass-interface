@@ -1,5 +1,5 @@
 import os
-import dill  # pip install dill --user
+# import dill  # pip install dill --user
 import sys
 import numpy as np
 import pandas as pd
@@ -13,7 +13,6 @@ def save_workspace(file="global_env"):
 # Load the session
 def load_workspace(file):
     dill.load_session(file + ".pkl")
-
 
 # Check files in current working directory
 def list_files(folder):
