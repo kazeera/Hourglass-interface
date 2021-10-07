@@ -6,6 +6,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
+from kivy.uix.image import Image
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem, TabbedPanelHeader
 from kivy.uix.textinput import TextInput
@@ -22,6 +23,9 @@ from kivy.uix.colorpicker import ColorPicker
 import pandas as pd
 from kivy.utils import get_color_from_hex, rgba
 import numpy as np
+
+from kivy.core.window import Window
+
 # to choose the colors randomly
 # every time you run it shows different color
 import random
@@ -29,7 +33,7 @@ import dill
 from functions import *
 
 class hourglassParameters():
-    name = None
+    datasetName = None
     filepath_matrix = None  # numeric matrix
     filepath_rowAnn = None  # describes rows of matrix
     filepath_colAnn = None  # describes columns of matrix
@@ -40,7 +44,7 @@ class hourglassParameters():
         pass
 
 class Dataset:
-    name = None
+    datasetName = None
     mat = None  # numeric matrix
     rowAnn = None  # describes rows of matrix
     colAnn = None  # describes columns of matrix
@@ -50,13 +54,18 @@ class Dataset:
 
 p = hourglassParameters()
 ds = Dataset()
-dill.load_session("dataset.pkl")
+# dill.load_session("dataset.pkl")
 # list(set(ds.rowAnn["Smoker"]))
 
+class Welcome(Widget):
+    pass
 
 # Upload Files ---
 class UploadTable(Widget):
-    # ds.name = self.ids.datasetName
+    def update_name(self):
+        ds.datasetName = self.ids.datasetName.text
+        ## Update dataset object
+        print_hourglass_parameter("datasetName", self.ids.datasetName)
     pass
 
 class FileChoosePopup(Popup):
@@ -88,19 +97,12 @@ class UploadFilePopup(BoxLayout):
         if self.id_parameter == "filepath_rowann":
             p.filepath_rowann = self.file_path
             ds.rowAnn = read_tbl(self.file_path)
-        if self.id_parameter == "filepath_matrix":
+        if self.id_parameter == "filepath_colann":
             p.filepath_matrix = self.file_path
             ds.colAnn = read_tbl(self.file_path)
 
-        ## Update dataset object
+        # Update dataset object
         print_hourglass_parameter(self.id_parameter, self.file_path) # TODO we can update our dataset object here
-
-    global currentButton # TODO has to be global?
-    currentButton = 'String'
-
-    def whats_the_button(self, button):
-        global currentButton
-        currentButton = button
 
 # Comparisons Table ---
 class ComparisonTable(BoxLayout):
@@ -141,6 +143,7 @@ class ComparisonTableRow(BoxLayout):
         ComparisonTable.row_info_list[int(self.id_number2)] = key_vals
         print(ComparisonTable.row_info_list[int(self.id_number2)])
 
+# Colors
 # todo Henry
 """
 Colors 
@@ -150,6 +153,9 @@ Issues:
 - displaying all row_Ann_vals with RecycleView
 """
 # https://stackoverflow.com/questions/58862489/how-can-i-call-an-on-pre-enter-function-in-kivy-for-my-root-screen
+# randomize colors https://www.youtube.com/watch?v=OkW-1uzP5Og
+# import random
+# color = [random.random() for i in xrange(3)] + [1]
 # Customize colors
 class CustomizeColors(RecycleView):
     # Make a list of unique main and subgroup comparisons (ie. rowAnn column names) that are not ""
@@ -157,30 +163,35 @@ class CustomizeColors(RecycleView):
         set([x["MainComparison"] for x in ComparisonTable.row_info_list if x["MainComparison"] != ""] +
             [x["Subgroup"] for x in ComparisonTable.row_info_list if x["Subgroup"] != ""]))
 
-    # Make a list of unique values in each rowAnn column
-    rowAnn_vals = [set(ds.rowAnn[x]) for x in rowAnn_cols if x in ds.rowAnn.columns]
+    if ds.rowAnn is not None:
+        # Make a list of unique values in each rowAnn column
+        rowAnn_vals = [set(ds.rowAnn[x]) for x in rowAnn_cols if x in ds.rowAnn.columns]
 
-    # If a custom_column is specified, make a set
-    custom_cols = set(item["CustomComparison"] for item in ComparisonTable.row_info_list if item["CustomComparison"] != "")
+        # If a custom_column is specified, make a set
+        custom_cols = set(item["CustomComparison"] for item in ComparisonTable.row_info_list if item["CustomComparison"] != "")
 
-    # If this set has a length greater than 0, append the levels (low/int/high) values to values list
-    if len(custom_cols) > 0:
-        rowAnn_cols.append("CustomComparison")
-        rowAnn_vals.append({"low", "int", "high"})
-    print(rowAnn_cols)
-    print(rowAnn_vals)
+        # If this set has a length greater than 0, append the levels (low/int/high) values to values list
+        if len(custom_cols) > 0:
+            rowAnn_cols.append("CustomComparison")
+            rowAnn_vals.append({"low", "int", "high"})
+        print(rowAnn_cols)
+        print(rowAnn_vals)
 
-    def __init__(self, **kwargs):
-        super(CustomizeColors, self).__init__(**kwargs)
-        self.data = [{'rowAnn_col': str(x)} for x in self.rowAnn_cols]
-        #
-        # for i in range(0, 10):
-        #     layout.add_widget(CCButton(rowAnn_val=str(i)))
+        def __init__(self, **kwargs):
+            super(CustomizeColors, self).__init__(**kwargs)
+            self.data = [{'rowAnn_col': str(x)} for x in self.rowAnn_cols]
+            # self.data = [{'row_id': i for i in range(len(self.rowAnn_cols))}]
+            #
+            # for i in range(0, 10):
+            #     layout.add_widget(CCButton(rowAnn_val=str(i)))
 
 class ColorPopup(Popup):
     load = ObjectProperty()
 
 class CCBoxlayout(BoxLayout):
+    row_id = ""
+    # rowAnn_col = CustomizeColors.rowAnn_cols[int(row_id)]
+    # rowAnn_vals = [CustomizeColors.rowAnn_vals[int(row_id)]]
     rowAnn_col = StringProperty()
 
 class CCButton(BoxLayout): # If this inherits Button, no overlap but it crashes when we pick color; If we make this BoxLayout, the color picker works but Value1 and Value2 overlap
@@ -215,6 +226,70 @@ class CCButton(BoxLayout): # If this inherits Button, no overlap but it crashes 
 class MakeGroups(Widget):
     pass
 
+class MakeGroupsTab1(BoxLayout):
+    id_number = -1
+    # Initialize list
+    row_list = []
+    row_info_list = []
+
+    # # # Simulate list
+    row_info_list = [{'GroupName': "T Cell Markers", 'GroupList': "Gene1, Gene2, Gene3"},
+                     {'GroupName': "B Cell Markers", 'GroupList': "Gene4,Gene5, Gene6, Gene7"},
+                     {'GroupName': "Immune Cell Markers", 'GroupList': "B Cell Markers, T Cell Markers"},
+                     {'GroupName': "ECM Markers", 'GroupList': "Gene24, Gene27, Gene35"}]
+
+    def add_a_row(self):
+        # Update ID number
+        self.id_number += 1
+        # Make current row
+        curr_row = MakeGroupsTab1Row(id_number2=str(self.id_number))
+        # Add to list of ComparisonTableRow objects
+        self.row_list.append(curr_row)
+        # Add row widget
+        self.ids.container.add_widget(curr_row)
+        # # Make a list of dict objects (dict object = row info)
+        self.row_info_list.append({'GroupName': "", 'GroupList': ""})
+
+class MakeGroupsTab1Row(BoxLayout):
+    id_number2 = StringProperty()
+
+    # TODO use to update kivy
+    def update_row_info(self):
+        key_vals = {
+            'GroupName': self.ids.group_name.text,
+            'GroupList': self.ids.group_list.text}
+
+        MakeGroupsTab1.row_info_list[int(self.id_number2)] = key_vals
+        print(MakeGroupsTab1.row_info_list[int(self.id_number2)])
+
+class MakeGroupsTab2(RecycleView):
+    colAnn_feature_col = StringProperty() # 'Gene.Sym'  # replace with correct drop down menu selection
+
+    # all_features = []
+    #
+    # for x in MakeGroupsTab1.row_info_list:
+    #     # String split by comma
+    #     x = x["GroupList"].split(',')
+    #     # Trim white space
+    #     x = [x_sub.strip() for x_sub in x]
+    #     # Genes present in colAnn
+    #     # x = [y for y in x if y in ds.colAnn[self.ids.colAnn_feature_col].values]
+    #     # Append to list
+    #     all_features = all_features + x
+    #
+    # # Unique feature list
+    # all_features = list(set(all_features))
+
+    all_features = ["Gene A", "Gene B", "Gene C", "Gene ", "Gene C", "Gene B", "Gene C", "Gene B"]
+
+    # Add a boxlayout with label for Gene and 2 textInputs
+    def __init__(self, **kwargs):
+        super(MakeGroupsTab2, self).__init__(**kwargs)
+        self.data = [{'label_text': str(x)} for x in self.all_features]
+
+class MakeGroupsTab2Label(BoxLayout):
+    label_text = StringProperty()
+
 # Custom widgets ---
 class CustomCheckbox(BoxLayout):
     label_text = StringProperty()
@@ -225,16 +300,33 @@ class CustomCheckbox(BoxLayout):
             print('The checkbox', checkbox, 'is active')
         else:
             print('The checkbox', checkbox, 'is inactive')
-
 class CustomSpinner(BoxLayout):
     label_text = StringProperty()
     spinner_list = ListProperty()
     initial_option = StringProperty()
     id_parameter = StringProperty()
+    ann = StringProperty('')# todo
 
+    # Print selection to console
     def clicked(self, key, value):
         # p.update(self, "mat", value)
         print_hourglass_parameter(key, value)
+
+    # Update column annotations
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_interval(self.update_clock, 5)
+
+    def update_clock(self, *args):
+        if self.ann == 'rowAnn':
+            self.spinner_list = HourglassApp.getRowAnnCols(self)
+        elif self.ann == 'colAnn':
+            self.spinner_list = HourglassApp.getColAnnCols(self)
+        else:
+            pass
+
+class SpinnerLabel(Label):
+    pass
 
 # Adv options ---
 class AdvancedOptions(Widget):
@@ -261,34 +353,24 @@ class KVTabLay(Widget):
     comp_table1 = ObjectProperty()
     pass
 
-def getRowAnnCols(self):
-    if ds.rowAnn is None:
-        return ""
-    else:
-        return [""] + list(ds.rowAnn.columns.values) # ["", "Smoker", "Age", "Survival.Time", "OS.Status"]
-
-def getColAnnCols(self):
-    if ds.rowAnn is None:
-        return ""
-    else:
-        return [""] + list(ds.colAnn.columns.values) # ["GeneSym", "GeneID", "Parameter"]
-
 class HourglassApp(App):
-    text_size = 19
+    text_size = 26
+    textInput_row_height = 60
 
     def getRowAnnCols(self):
         if ds.rowAnn is None:
-            return ""
+            return [""]
         else:
-            return [""] + list(ds.rowAnn.columns.values)  # ["", "Smoker", "Age", "Survival.Time", "OS.Status"]
+            return [""] + list(ds.rowAnn.columns.values) # list(ds.rowAnn.columns.values)  # ["", "Smoker", "Age", "Survival.Time", "OS.Status"]
 
     def getColAnnCols(self):
-        if ds.rowAnn is None:
+        if ds.colAnn is None:
             return ""
         else:
             return [""] + list(ds.colAnn.columns.values)  # ["GeneSym", "GeneID", "Parameter"]
 
     def build(self):
+        Window.clearcolor = (1,1,1,1)
         return KVTabLay()
 
 if __name__ == '__main__':

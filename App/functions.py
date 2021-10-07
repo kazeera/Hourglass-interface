@@ -52,22 +52,19 @@ def intersect(arr1, arr2):
 def read_tbl(filepath, sep="\t", header=0, index_col=0):
 
     try:
-        if grepl(filepath, ".csv"):
+        if grepl([filepath], ".csv"):
             # Read into pandas data frame
-            df = pd.read_csv(filepath, header=header, index_col=index_col)
+            return pd.read_csv(filepath, header=header, index_col=index_col)
 
-        if grepl(filepath, ".txt"):
+        if grepl([filepath], ".txt"):
             # Read into pandas data frame
-            df = pd.read_table(filepath, sep=sep, header=header, index_col=index_col)
+            return pd.read_table(filepath, sep=sep, header=header, index_col=index_col)
 
     except Exception as e:
         # If file isn't found throw error, and specify number of files matching the key
         print("Oops!", e.__class__, "occurred.")
         print(len(filepath), "not found.")
         return None
-
-    else:
-        return df
 
 # Sort by a value in ascending/descending order
 # axis 0 is by column and 1 is by row

@@ -1,3 +1,7 @@
+#: import Label kivy.uix.label.Label
+
+#:import Factory kivy.factory.Factory
+
 <UploadTable>
     GridLayout:
         cols: 1
@@ -8,11 +12,14 @@
 
             Label:
                 text: 'Name of Dataset'
+                font_size: 20
 
             TextInput:
                 id: datasetName
                 multiline: False
                 hint_text: 'Enter Text Here'
+                font_size: 20
+                on_text: root.update_name()
 
         UploadFilePopup:
             id_parameter: 'filepath_matrix'
@@ -31,7 +38,7 @@
 
     Label:
         text_size: self.size
-        # font_size: app.text_size
+        font_size: 20
         halign: 'center'
         valign: 'middle'
         text: root.label_text
@@ -40,7 +47,6 @@
         text: root.button_text
         font_size: app.text_size
         on_press: root.open_popup()
-        on_press: root.whats_the_button(root.id_parameter)
 
 <FileChoosePopup>:
     title: "Choose a file"
@@ -65,8 +71,8 @@
 <ComparisonTable>:
 	GridLayout:
 		cols:1
-        Label:
-            text: "Custom Comparison = Filter by column name of feature/gene from numeric matrix table. We recommend copying and pasting directly to avoid misspellings."
+        # Label:
+        #    text: "Custom Comparison = Filter by column name of feature/gene from numeric matrix table. We recommend copying and pasting directly to avoid misspellings."
 		ScrollView:
 			GridLayout:
 				id: container
@@ -80,9 +86,11 @@
 		    Button:
 			    text: "Add a comparison (row)"
 			    on_release: root.add_a_row()
+                font_size: app.text_size
             Button:
 			    text: "Remove first comparison (row)"
 			    on_release: root.remove_a_row2()
+                font_size: app.text_size
 
 <ComparisonTableRow>:
     orientation: "horizontal"
@@ -97,7 +105,8 @@
         id: main_comparison
         font_size: app.text_size
         values: app.getRowAnnCols()
-        text: 'Main Comparison'
+        text: 'Comparison'
+        ann: 'rowAnn'
         on_text: root.update_row_info()
 
     Spinner:
@@ -105,6 +114,7 @@
         font_size: app.text_size
         text: 'Subgroup'
         values: app.getRowAnnCols()
+        ann: 'rowAnn'
         on_text: root.update_row_info()
 
     TextInput:
@@ -119,30 +129,85 @@
         multiline: False
         on_text: root.update_row_info()
 
-<CCBoxlayout>
+<MakeGroups>
+    TabbedPanel:
+        size: root.width, root.height
+        do_default_tab: False
+        tab_width: 400
+
+        TabbedPanelItem:
+            text: '1. Make Groups and Super-Groups'
+            font_size: app.text_size
+            MakeGroupsTab1:
+
+        TabbedPanelItem:
+            text: '2. Pick Parameters'
+            font_size: app.text_size
+            MakeGroupsTab2:
+
+
+<MakeGroupsTab1>
+	GridLayout:
+		cols:1
+
+        Button:
+            size_hint: .5,.5
+            text: "New Group (Add a Row)"
+            on_release: root.add_a_row()
+            font_size: app.text_size
+
+		ScrollView:
+			GridLayout:
+				id: container
+				cols: 1
+				size_hint_y: None
+				height: self.minimum_height
+				row_force_default: True
+				row_default_height: dp(26)
+				font_size: app.text_size
+
+<MakeGroupsTab1Row>
     orientation: "horizontal"
+    id: id_number2
+
+    TextInput:
+        id: group_name
+        hint_text: "Name of Group"
+        multiline: False
+        on_text: root.update_row_info()
+
+    TextInput:
+        id: group_list
+        hint_text: "List of features (e.g. Gene1,Gene2,Gene3) or groups"
+        on_text: root.update_row_info()
+
+<MakeGroupsTab2>
+
+    viewclass: 'MakeGroupsTab2Label'
+
+    RecycleBoxLayout:
+        size_hint: (None, None)
+        height: self.minimum_height
+        orientation: 'vertical'
+
+
+<MakeGroupsTab2Label>
+    orientation: 'horizontal'
 
     Label:
-        text: root.rowAnn_col
-        size: 200, 50
-        size_hint: None, None
+        text: root.label_text
+        font_size: 8
+        # size_hint: 0.3, 1
 
-    CCButton:
-        rowAnn_val: 'Value1'
+    TextInput:
+        id: std_parameter
+        hint_text: "Standard Parameter (required)"
+        # size_hint: 0.35, 1
 
-    CCButton:
-        rowAnn_val: 'Value2'
-
-<CCButton> # todo If this is a BoxLayout, add a Button
-    Button:
-        id: color_button
-        font_size: app.text_size
-        size: 200, 50
-        text: root.rowAnn_val
-        size_hint: None, None
-        background_normal: ''
-        background_color: root.button_color
-        on_press: root.open_popup()
+    TextInput:
+        id: alt_parameter
+        hint_text: "Alternative Parameter"
+        # size_hint: 0.35, 1
 
 <CustomizeColors>
     viewclass: 'CCBoxlayout'
@@ -150,7 +215,26 @@
     RecycleBoxLayout:
         size_hint_y: None
         height: self.minimum_height
+        width: self.minimum_width
         orientation: 'vertical'
+
+<CCBoxlayout>
+    orientation: "horizontal"
+
+    Label:
+        text: root.rowAnn_col
+
+
+<CCButton>
+    Button:
+        id: color_button
+        font_size: app.text_size
+        text: root.rowAnn_val
+        size_hint: None, None
+        background_normal: ''
+        background_color: root.button_color
+        on_press: root.open_popup()
+
 
 <ColorPopup>:
     title: 'Pick a Color'
@@ -171,7 +255,6 @@
             on_press: root.load(colorpicker)
 
 <CustomCheckbox>
-    Label:
     CheckBox:
         active: root.check_box
     Label:
@@ -182,22 +265,30 @@
         valign: 'middle'
         text: root.label_text
 
+<MyOption@SpinnerOption>:
+    font_size: app.text_size
+
+<SpinnerLabel>
+    id: label
+    text_size: self.size
+    font_size: app.text_size
+    halign: 'right'
+    valign: 'middle'
+    text: root.label_text
+    font_size: app.text_size
+
 <CustomSpinner>
     Label:
-        id: label
-        font_size: app.text_size
-        text_size: self.size
-        halign: 'right'
-        valign: 'middle'
         text: root.label_text
+        font_size: app.text_size
     AnchorLayout:
         Spinner:
             size_hint: .8, .4
             id: spinner
-            font_size: app.text_size
             text: root.initial_option
+            font_size: app.text_size
+            option_cls: Factory.get("MyOption")
             values: root.spinner_list
-            text_autoupdate: True
             on_text: root.clicked(root.id_parameter, spinner.text)
 
 <AdvancedOptions>
@@ -206,8 +297,8 @@
         size: root.width, root.height
 
         CustomSpinner:
-            id_parameter: 'correlation_method'
             label_text: 'Correlation Method'
+            id_parameter: 'correlation_method'
             initial_option: 'pearson'
             spinner_list: ["pearson", "kendall", "spearman"]
 
@@ -223,11 +314,11 @@
             initial_option: 'stars'
             spinner_list: ["stars", "numbers"]
 
-
         CustomSpinner:
             id_parameter: 'paired_analysis_id'
             label_text: 'Paired analysis column:'
             spinner_list: app.getRowAnnCols()
+            ann: 'rowAnn'
 
         CustomCheckbox:
             id_parameter: 'do_survival_analysis'
@@ -238,11 +329,13 @@
             id_parameter: 'surv_time_column'
             label_text: 'Survival time column:'
             spinner_list: app.getRowAnnCols()
+            ann: 'rowAnn'
 
         CustomSpinner:
             id_parameter: 'surv_status_column'
             label_text: 'Censoring status (1=censored, 2=dead) column:'
             spinner_list: app.getRowAnnCols()
+            ann: 'rowAnn'
 
         GridLayout:
             cols: 2
@@ -262,85 +355,88 @@
         size: root.width, root.height
         cols: 1
 
-        GridLayout:
-            cols: 2
+        CustomCheckbox:
+            label_text: 'Quality Control Plots:'
+            color: 1,0,1,1
+            check_box: False
+        Label:
 
-            CustomCheckbox:
-                label_text: 'Quality Control Plots:'
-                color: 1,0,1,1
-                check_box: False
-            Label:
+        CustomSpinner:
+            id_parameter: 'colAnn1'
+            label_text: 'By.Parameter Column'
+            spinner_list: app.getColAnnCols()
+            ann: 'colAnn'
 
-            CustomSpinner:
-                id_parameter: 'colAnn1'
-                label_text: 'By.Parameter Column'
-                spinner_list: app.getColAnnCols() #TODO populate with column names of column annotations
+        CustomSpinner:
+            id_parameter: 'colAnn2'
+            label_text: 'By.Feature Column'
+            spinner_list: app.getColAnnCols()
+            ann: 'colAnn'
 
-            CustomSpinner:
-                id_parameter: 'colAnn2'
-                label_text: 'By.Feature Column'
-                spinner_list: app.getColAnnCols() #TODO populate with column names of column annotations
+        Label:
+            text: '"Make Groups" Plots only:'
+            halign: 'right'
+            font_size: app.text_size
+            # color: 1,0,1,1
+        Label:
 
-            Label:
-            Label:
+        CustomCheckbox:
+            label_text: 'Individual boxplots'
+            id_parameter: 'boxplot_indiv'
 
-            Label:
-                text: '"Make Groups" Plots only:'
-                halign: 'right'
-                font_size: app.text_size
-                # color: 1,0,1,1
-            Label:
+        CustomCheckbox:
+            label_text: 'Overview boxplots'
+            id_parameter: 'boxplot_overview'
 
-            CustomCheckbox:
-                label_text: 'Make individual boxplots'
+        CustomCheckbox:
+            label_text: 'Heatmaps'
+            id_parameter: 'heatmap'
 
-            CustomCheckbox:
-                label_text: 'Make overview boxplots'
+        CustomCheckbox:
+            label_text: 'Correlation plots'
+            id_parameter: 'corrplot'
 
-            CustomCheckbox:
-                label_text: 'Make heatmaps'
+        CustomCheckbox:
+            label_text: 'Correlation scatter (features < 50)'
+            id_parameter: 'corrscatt_overview'
 
-            CustomCheckbox:
-                label_text: 'Make correlation plots'
+        CustomCheckbox:
+            label_text: 'Individual correlation scatter'
+            id_parameter: 'corrscatt_indiv'
+            check_box: False
 
-            CustomCheckbox:
-                label_text: 'Make correlation scatter plots (features < 50)'
+        CustomCheckbox:
+            label_text: 'p-value/fold-change heatmap'
+            id_parameter: 'pval_FC_heatmap'
 
-            CustomCheckbox:
-                label_text: 'Make individual correlation scatter plots (takes a long time)'
-                check_box: False
+        CustomCheckbox:
+            label_text: 'Profile barplots'
+            id_parameter: 'barplot'
 
-            CustomCheckbox:
-                label_text: 'Make p-value/fold-change heatmap'
-
-            CustomCheckbox:
-                label_text: 'Make profile (stacked) barplots'
-
-            CustomCheckbox:
-                label_text: 'Make profile (stacked) barplots'
-
-            Label:
-            Label:
-            Button:
-                text: 'Download hourglass settings'
+        #    text: 'Download hourglass settings'
 
         AnchorLayout:
             Button:
-                size_hint: .5, .5
+                size_hint: .5, .8
                 text: 'Run hourglass'
                 font_size: app.text_size
-                # background_color: [1, 1, 1, 0.4]
-
-<MakeGroups>
-    TabbedPanel:
+                background_color: [1, 1, 1, 0.4]
+<Welcome>
+    BoxLayout:
+        orientation: "vertical"
         size: root.width, root.height
-        do_default_tab: False
-        tab_width: 300
+        padding: 50
+        spacing: 20
 
-        TabbedPanelItem:
-            text: '1. Name Groups'
-        TabbedPanelItem:
-            text: '2. Pick Relevant Features and Parameters'
+        Image:
+            source: 'icons/hourglass.gif'
+
+        Label:
+            text: 'Follow the tabs on the top to go through the workflow.'
+            font_size: app.text_size
+        Label:
+            text: 'Hit the "Run" button at the end!'
+            font_size: app.text_size
 
 <KVTabLay>
     TabbedPanel:
@@ -348,30 +444,42 @@
         do_default_tab: False
         tab_width: 300
         tab_height: 75
+        font_size: app.text_size
 
         TabbedPanelItem:
-            text: 'Customize Colours'
-            CustomizeColors:
+            text: 'Welcome to hourglass'
+            font_size: app.text_size
+            Welcome:
 
         TabbedPanelItem:
             text: 'Upload Data'
+            font_size: app.text_size
             UploadTable:
 
         TabbedPanelItem:
             text: 'Pick Comparisons'
+            font_size: app.text_size
             ComparisonTable:
 
         TabbedPanelItem:
             text: 'Make Groups'
+            font_size: app.text_size
             MakeGroups:
+
+        # TabbedPanelItem:
+        #    text: 'Customize Colours'
+        #    font_size: app.text_size
+        #    CustomizeColors:
 
         TabbedPanelItem:
             text: 'Advanced Options'
+            font_size: app.text_size
             AdvancedOptions:
 
-        TabbedPanelItem:
-            text: 'Data Explorer'
+        # TabbedPanelItem:
+        #    text: 'Data Explorer'
 
         TabbedPanelItem:
-            text: 'Run Hourglass'
+            text: 'Run hourglass'
+            font_size: app.text_size
             RunHourglass:
