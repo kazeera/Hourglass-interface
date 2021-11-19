@@ -33,15 +33,62 @@ import dill
 from functions import *
 
 class hourglassParameters():
-    datasetName = None
+    ## Properties = User specifications
+    # Data file paths
     filepath_matrix = None  # numeric matrix
     filepath_rowAnn = None  # describes rows of matrix
     filepath_colAnn = None  # describes columns of matrix
-    comparisons_table = None
-    correlation_method = None
+
+    # Name
+    datasetName = "Dataset"
+
+    # Make Comparisons tab
+    comparisons_table = [] # list of dict objects: {'MainComparison': "", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}
+
+    # Feature Sets tab = Custom analysis in R (key/values)
+    feature_sets = [] # list of dict objects for feature set name and comma-delimited list: {'GroupName': "", 'GroupList':""}
+    feature_parameters = [] # list of dict objects for parameters for each feature and comma-delimited list: {'Feature': "", 'StdParam':"", 'AltParam':""}
+
+    # Customize Colors tab
+
+
+    # Advanced Options tab
+    correlation_method = "pearson" # default correlation method for correlation plot
+    pval_test = "t.test" # default 2 sample statistical test
+    pval_label = "stars" # default labels for p-values on box and correlation plots
+    paired_analysis_id = "" # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
+    do_survival_analysis = False # perform survival analysis?
+    surv_time_column = "NA" # OS/DFS time column in rowAnn
+    surv_status_column = "NA"# vital status/event column in rowAnn
+    do_impute = False # run imputed version in parallel?
+    impute_with_mean = 5 # percent +/- around mean to impute missing values
+
+    # Run hourglass tab
+    make_qc = False # make quality control (qc) boxplots?
+    colAnn1 = "NA" # parameter column in colAnn (e.g. Parameter, Readout)
+    colann2 = "NA" # feature column in colAnn (e.g. Gene.Sym, Stain)
+    # if feature_sets is not empty --
+    boxplot_indiv = True # make individual boxplots
+    heatmap = True # make heatmaps showing all features in all samples/patients?
+    corrplot = True # make correlation plots comparing all features?
+    corrscatt_overview = False # make correlation scatter plots comparing all features?
+    pval_FC_heatmap = True # make heatmaps showing fold-change and p-values for each comparison?
+    barplot = True # make discrete bar plots showing feature amounts in each patient/sample?
+
+    # p.update_value(self, property=key, value=value)
+
+    def update_property(self, property, value):
+        # todo how to make generic function to update a python propertY?
+        # something like?
+        # self.[[property]] = value
+        # self.*property = value
+        pass
+        # also todo add this function to all fields such as textInput, it's currently only in CustomSpinner class
 
     def __init__(self):
         pass
+
+#
 
 class Dataset:
     datasetName = None
@@ -52,7 +99,16 @@ class Dataset:
     def __init__(self):
         pass
 
+# Instantiate parameters object (save variables here to input into R)
 p = hourglassParameters()
+
+# # Simulate user input
+# p.feature_sets = [{'GroupName': "T Cell Markers", 'GroupList': "Gene1, Gene2, Gene3"},
+#                   {'GroupName': "B Cell Markers", 'GroupList': "Gene4,Gene5, Gene6, Gene7"},
+#                   {'GroupName': "Immune Cell Markers", 'GroupList': "B Cell Markers, T Cell Markers"},
+#                   {'GroupName': "ECM Markers", 'GroupList': "Gene24, Gene27, Gene35"}]
+# p.comparisons_table = [{'MainComparison': "Smoker", 'Subgroup': "", 'CustomComparison': "Gene1", 'Filter': ""}, {'MainComparison': "Sex", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}, {'MainComparison': "Cancer.Type", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}]
+
 ds = Dataset()
 # dill.load_session("dataset.pkl")
 # list(set(ds.rowAnn["Smoker"]))
@@ -111,9 +167,6 @@ class ComparisonTable(BoxLayout):
     # Initialize list
     row_list = []
     row_info_list = []
-    #
-    # # Simulate list
-    row_info_list = [{'MainComparison': "Smoker", 'Subgroup': "", 'CustomComparison': "Gene1", 'Filter': ""}, {'MainComparison': "Sex", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}, {'MainComparison': "Cancer.Type", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}]
 
     def add_a_row(self):
         # Update ID number
@@ -140,8 +193,9 @@ class ComparisonTableRow(BoxLayout):
                     'Subgroup': "" if self.ids.subgroup.text == "Subgroup" else self.ids.subgroup.text,
                     'CustomComparison': self.ids.custom_comparison.text,
                     'Filter': self.ids.filter.text}
-        ComparisonTable.row_info_list[int(self.id_number2)] = key_vals
-        print(ComparisonTable.row_info_list[int(self.id_number2)])
+        ComparisonTable.row_info_list[int(self.id_number2)] = key_vals #TODO remove and just directly update/read from "p" object as seen in line below
+        p.comparisons_table = ComparisonTable.row_info_list
+        print( ComparisonTable.row_info_list[int(self.id_number2)])
 
 # Colors
 # todo Henry
@@ -222,73 +276,124 @@ class CCButton(BoxLayout): # If this inherits Button, no overlap but it crashes 
             self.ids.color_button.background_color = str(self.rowAnn_val_color)
         print(self.rowAnn_val_color)
 
-# Make Groups ---
-class MakeGroups(Widget):
+# Make Groups (now called Feature Sets) tab ---
+class FeatureSets(Widget):
     pass
 
-class MakeGroupsTab1(BoxLayout):
+class FeatureTab1(BoxLayout):
     id_number = -1
     # Initialize list
     row_list = []
-    row_info_list = []
-
-    # # # Simulate list
-    row_info_list = [{'GroupName': "T Cell Markers", 'GroupList': "Gene1, Gene2, Gene3"},
-                     {'GroupName': "B Cell Markers", 'GroupList': "Gene4,Gene5, Gene6, Gene7"},
-                     {'GroupName': "Immune Cell Markers", 'GroupList': "B Cell Markers, T Cell Markers"},
-                     {'GroupName': "ECM Markers", 'GroupList': "Gene24, Gene27, Gene35"}]
 
     def add_a_row(self):
         # Update ID number
         self.id_number += 1
         # Make current row
-        curr_row = MakeGroupsTab1Row(id_number2=str(self.id_number))
+        curr_row = FeatureTab1Row(id_featuretab1=str(self.id_number))
         # Add to list of ComparisonTableRow objects
         self.row_list.append(curr_row)
         # Add row widget
         self.ids.container.add_widget(curr_row)
-        # # Make a list of dict objects (dict object = row info)
-        self.row_info_list.append({'GroupName': "", 'GroupList': ""})
+        # Make a list of dict objects (dict object = row info)
+        p.feature_sets.append({'GroupName': "", 'GroupList': ""})
 
-class MakeGroupsTab1Row(BoxLayout):
-    id_number2 = StringProperty()
+class FeatureTab1Row(BoxLayout):
+    id_featuretab1 = StringProperty()
+
+    def update_row_info(self):
+        # Create dictionary variable to store feature subset name/list
+        key_vals = {
+            'GroupName': self.ids.group_name.text,
+            'GroupList': self.ids.group_list.text
+        }
+        # Update hourglass parameters object
+        p.feature_sets[int(self.id_featuretab1)] = key_vals
+        print(p.feature_sets[int(self.id_featuretab1)])
+
+class FeatureTab2(BoxLayout):
+    # self.colAnn_feature_col = 'Gene.Sym'  #StringProperty()  replace with correct drop down menu selection
+    row_list = []
+    id_number = -1
+
+    # Add a boxlayout with label for Gene and 2 textInputs
+    def __init__(self, **kwargs):
+        # super(FeatureTab2, self).__init__(**kwargs)
+        super().__init__(**kwargs)
+
+        # # # If list is not empty populate tab with current features
+        # if p.feature_parameters:
+        #     self.data = [{'label_text': str(x)} for x in [x['Feature'] for x in p.feature_parameters]]
+
+        # Set clock to refresh tab every 3 seconds
+        Clock.schedule_interval(self.update_clock, 3)
+
+    def update_clock(self, *args):
+        self.update_features()
+        # self.data = [{'label_text': str(x)} for x in self.features]
+
+    # Set self.features to a list of the features listed in  p.feature_sets
+    def update_features(self, *args):
+        #  Current features
+        curr = [x['Feature'] for x in p.feature_parameters]
+
+        new = []
+        for x in p.feature_sets: #FeatureTab1.row_info_list:
+            # String split by comma
+            x = x["GroupList"].split(',')
+            # Trim white space
+            x = [x_sub.strip() for x_sub in x]
+            # # Genes present in colAnn #todo get this to work colAnn_feature_col = 'Gene Sym'
+            # x = [y for y in x if y in ds.colAnn[self.ids.colAnn_feature_col].values]
+            # # Append to list if it's not in current list
+            new = new + x
+
+        # Remove empty
+        if '' in new:
+            new.remove('')
+
+        # Add new features
+        to_add = [i for i in new if i not in curr]
+        # Remove features in Group Names
+        grp_names = [i['GroupName'] for i in p.feature_sets]
+        to_add = [j for j in to_add if j not in grp_names]
+
+        if to_add:
+            for f in to_add:
+                p.feature_parameters.append({'Feature': f, 'StdParam': "", 'AltParam': ""})
+                # Update ID number
+                self.id_number += 1
+                curr_row = FeatureTab2Label(label_text=f, id_featuretab2=str(self.id_number))
+                # Add to list of ComparisonTableRow objects
+                self.row_list.append(curr_row)
+                # Add row widget
+                self.ids.container.add_widget(curr_row)
+
+        # Remove features that are not found anymore
+        to_rm = list(set(curr) - set(new))
+
+        if to_rm:
+            for f in to_rm:
+                # Gets the first item from the list that matches the condition, and returns None if no item matches
+                curr_row = next((x for x in self.row_list if x.label_text == f), None)
+                self.ids.container.remove_widget(curr_row)
+                self.row_list.remove(curr_row)
+            p.feature_parameters = [d for d in p.feature_parameters if d['Feature'] not in to_rm]
+
+class FeatureTab2Label(BoxLayout):
+    id_featuretab2 = StringProperty()
+    label_text = StringProperty()
 
     # TODO use to update kivy
     def update_row_info(self):
         key_vals = {
-            'GroupName': self.ids.group_name.text,
-            'GroupList': self.ids.group_list.text}
-
-        MakeGroupsTab1.row_info_list[int(self.id_number2)] = key_vals
-        print(MakeGroupsTab1.row_info_list[int(self.id_number2)])
-
-class MakeGroupsTab2(RecycleView):
-    colAnn_feature_col = StringProperty() # 'Gene.Sym'  # replace with correct drop down menu selection
-
-    # all_features = []
-    #
-    # for x in MakeGroupsTab1.row_info_list:
-    #     # String split by comma
-    #     x = x["GroupList"].split(',')
-    #     # Trim white space
-    #     x = [x_sub.strip() for x_sub in x]
-    #     # Genes present in colAnn
-    #     # x = [y for y in x if y in ds.colAnn[self.ids.colAnn_feature_col].values]
-    #     # Append to list
-    #     all_features = all_features + x
-    #
-    # # Unique feature list
-    # all_features = list(set(all_features))
-
-    all_features = ["Gene A", "Gene B", "Gene C", "Gene ", "Gene C", "Gene B", "Gene C", "Gene B"]
-
-    # Add a boxlayout with label for Gene and 2 textInputs
-    def __init__(self, **kwargs):
-        super(MakeGroupsTab2, self).__init__(**kwargs)
-        self.data = [{'label_text': str(x)} for x in self.all_features]
-
-class MakeGroupsTab2Label(BoxLayout):
-    label_text = StringProperty()
+            'Feature': self.ids.feature.text,
+            'StdParam': "" if self.ids.std_parameter.text == "Standard Parameter (required)" else self.ids.std_parameter.text,
+            'AltParam': "" if self.ids.alt_parameter.text == "Alternative Parameter" else self.ids.alt_parameter.text,
+        }
+        # Update existing feature
+        p.feature_parameters['Feature' == self.ids.feature.text] = key_vals
+        # Print
+        print(p.feature_parameters['Feature' == self.ids.feature.text])
 
 # Custom widgets ---
 class CustomCheckbox(BoxLayout):
@@ -300,6 +405,7 @@ class CustomCheckbox(BoxLayout):
             print('The checkbox', checkbox, 'is active')
         else:
             print('The checkbox', checkbox, 'is inactive')
+
 class CustomSpinner(BoxLayout):
     label_text = StringProperty()
     spinner_list = ListProperty()
@@ -309,8 +415,8 @@ class CustomSpinner(BoxLayout):
 
     # Print selection to console
     def clicked(self, key, value):
-        # p.update(self, "mat", value)
         print_hourglass_parameter(key, value)
+        # p.update_property(self, property=key, value=value) #todo
 
     # Update column annotations
     def __init__(self, **kwargs):
@@ -325,22 +431,13 @@ class CustomSpinner(BoxLayout):
         else:
             pass
 
-class SpinnerLabel(Label):
+class SpinnerLabel(Label): #todo make this class and add it :D ???
+    # net:
     pass
 
 # Adv options ---
 class AdvancedOptions(Widget):
-    def correlation_clicked(self, value):
-        self.correlation = f'{value}'
-        # self.ids.correlation_label.text = f'{value}'
-
-    def pvaltest_clicked(self, value):
-        self.pvaltest = f'{value}'
-        # self.ids.pvaltest_label.text = f'{value}'
-
-    def pvallabel_clicked(self, value):
-        self.pvallabel = f'{value}'
-        # self.ids.pvallabel_label.text = f'{value}'
+    pass
 
 class RunHourglass(Widget):
     def runHourglass(self):
@@ -375,3 +472,4 @@ class HourglassApp(App):
 
 if __name__ == '__main__':
     HourglassApp().run()
+
