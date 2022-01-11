@@ -3,7 +3,6 @@ class Dataset:
     mat = None  # numeric matrix
     rowAnn = None  # describes rows of matrix
     colAnn = None  # describes columns of matrix
-    rowAnn = None
     
     def __init__(self):
         pass

@@ -216,25 +216,29 @@
 <CustomizeColors>
     viewclass: 'CCBoxlayout'
 
-    RecycleBoxLayout:
+    RecycleGridLayout:
+        default_size: None, dp(56)
+        default_size_hint: 1, None
         size_hint_y: None
         height: self.minimum_height
-        width: self.minimum_width
-        orientation: 'vertical'
+        # width: self.minimum_width # new
+        multiselect: True
+        touch_multiselect: True
+        cols: 1
+
 
 <CCBoxlayout>
-    orientation: "horizontal"
+    orientation: 'horizontal'
 
-    Label:
-        text: root.rowAnn_col
+    CCButton:
+        button_text: root.rowAnn_val
 
 
 <CCButton>
     Button:
         id: color_button
         font_size: app.text_size
-        text: root.rowAnn_val
-        size_hint: None, None
+        text: root.button_text
         background_normal: ''
         background_color: root.button_color
         on_press: root.open_popup()
@@ -301,42 +305,42 @@
         size: root.width, root.height
 
         CustomSpinner:
+            id: correlation_method
             label_text: 'Correlation Method'
-            id_parameter: 'correlation_method'
             initial_option: 'pearson'
             spinner_list: ["pearson", "kendall", "spearman"]
 
         CustomSpinner:
-            id_parameter: 'pval_test'
+            id: pval_test
             label_text: 'Test Method'
             initial_option: 't.test'
             spinner_list: ["t.test", "wilcox"]
 
         CustomSpinner:
-            id_parameter: 'pval_label'
+            id: pval_label
             label_text: 'P-values Label'
             initial_option: 'stars'
             spinner_list: ["stars", "numbers"]
 
         CustomSpinner:
-            id_parameter: 'paired_analysis_id'
+            id: paired_analysis_id
             label_text: 'Paired analysis column:'
             spinner_list: app.getRowAnnCols()
             ann: 'rowAnn'
 
         CustomCheckbox:
-            id_parameter: 'do_survival_analysis'
+            id: do_survival_analysis
             label_text: 'Run survival analysis - pick columns from row annotations:'
             check_box: False
 
         CustomSpinner:
-            id_parameter: 'surv_time_column'
+            id: surv_time_column
             label_text: 'Survival time column:'
             spinner_list: app.getRowAnnCols()
             ann: 'rowAnn'
 
         CustomSpinner:
-            id_parameter: 'surv_status_column'
+            id: surv_status_column
             label_text: 'Censoring status (1=censored, 2=dead) column:'
             spinner_list: app.getRowAnnCols()
             ann: 'rowAnn'
@@ -344,7 +348,7 @@
         GridLayout:
             cols: 2
             CustomCheckbox:
-                id_parameter: 'do_impute'
+                id: do_impute
                 label_text: 'Run imputed version in parallel - impute NAs % around mean = '
                 check_box: False
             AnchorLayout:
@@ -361,19 +365,20 @@
 
         CustomCheckbox:
             label_text: 'Quality Control Plots:'
+            id: make_qc
             id_parameter: 'make_qc'
             color: 1,0,1,1
             check_box: False
         Label:
 
         CustomSpinner:
-            id_parameter: 'colAnn1'
+            id: colAnn1
             label_text: 'By.Parameter Column'
             spinner_list: app.getColAnnCols()
             ann: 'colAnn'
 
         CustomSpinner:
-            id_parameter: 'colAnn2'
+            id: colAnn2
             label_text: 'By.Feature Column'
             spinner_list: app.getColAnnCols()
             ann: 'colAnn'
@@ -387,31 +392,33 @@
 
         CustomCheckbox:
             label_text: 'Individual boxplots'
-            id_parameter: 'boxplot_indiv'
+            id: boxplot_indiv
 
         CustomCheckbox:
             label_text: 'Overview boxplots'
-            id_parameter: 'boxplot_overview'
+            id: boxplot_overview
 
         CustomCheckbox:
             label_text: 'Heatmaps'
-            id_parameter: 'heatmap'
+            id: heatmap
 
         CustomCheckbox:
             label_text: 'Correlation plots'
-            id_parameter: 'corrplot'
+            id: corrplot
 
         CustomCheckbox:
             label_text: 'Correlation scatter (features < 50)'
+            id: corrscatt_overview
             id_parameter: 'corrscatt_overview'
+
 
         CustomCheckbox:
             label_text: 'p-value/fold-change heatmap'
-            id_parameter: 'pval_FC_heatmap'
+            id: pval_FC_heatmap
 
         CustomCheckbox:
             label_text: 'Profile barplots'
-            id_parameter: 'barplot'
+            id: barplot
 
         #    text: 'Download hourglass settings'
 
@@ -466,10 +473,10 @@
             font_size: app.text_size
             FeatureSets:
 
-        # TabbedPanelItem:
-        #    text: 'Customize Colours'
-        #    font_size: app.text_size
-        #    CustomizeColors:
+        TabbedPanelItem:
+            text: 'Customize Colours'
+            font_size: app.text_size
+            CustomizeColors:
 
         TabbedPanelItem:
             text: 'Advanced Options'
