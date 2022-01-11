@@ -50,11 +50,9 @@ class hourglassParameters():
     feature_parameters = [] # list of dict objects for parameters for each feature and comma-delimited list: {'Feature': "", 'StdParam':"", 'AltParam':""}
 
     # Customize Colors tab
-<<<<<<< HEAD
-    color_palette = []
-=======
 
->>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
+    color_palette = []
+
 
     # Advanced Options tab
     correlation_method = "pearson" # default correlation method for correlation plot
@@ -73,10 +71,7 @@ class hourglassParameters():
     colann2 = "NA" # feature column in colAnn (e.g. Gene.Sym, Stain)
     # if feature_sets is not empty --
     boxplot_indiv = True # make individual boxplots
-<<<<<<< HEAD
     boxplot_overview = True  # makes overview of boxplots
-=======
->>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
     heatmap = True # make heatmaps showing all features in all samples/patients?
     corrplot = True # make correlation plots comparing all features?
     corrscatt_overview = False # make correlation scatter plots comparing all features?
@@ -115,13 +110,10 @@ p = hourglassParameters()
 #                   {'GroupName': "B Cell Markers", 'GroupList': "Gene4,Gene5, Gene6, Gene7"},
 #                   {'GroupName': "Immune Cell Markers", 'GroupList': "B Cell Markers, T Cell Markers"},
 #                   {'GroupName': "ECM Markers", 'GroupList': "Gene24, Gene27, Gene35"}]
-<<<<<<< HEAD
 # p.comparisons_table = [{'MainComparison': "Smoker", 'Subgroup': "", 'CustomComparison': "Gene1", 'Filter': ""},
 #                       {'MainComparison': "Sex", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""},
 #                       {'MainComparison': "Cancer.Type", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}]
-=======
 # p.comparisons_table = [{'MainComparison': "Smoker", 'Subgroup': "", 'CustomComparison': "Gene1", 'Filter': ""}, {'MainComparison': "Sex", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}, {'MainComparison': "Cancer.Type", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}]
->>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
 
 ds = Dataset()
 # dill.load_session("dataset.pkl")
@@ -215,7 +207,6 @@ class ComparisonTableRow(BoxLayout):
         p.comparisons_table = ComparisonTable.row_info_list
         print( ComparisonTable.row_info_list[int(self.id_number2)])
 
-<<<<<<< HEAD
 # Make Groups (now called Feature Sets) tab ---
 class FeatureSets(Widget):
     pass
@@ -335,9 +326,6 @@ class FeatureTab2Label(BoxLayout):
         # Print
         print(p.feature_parameters['Feature' == self.ids.feature.text])
 
-
-# Colors ---------------------
-=======
 # Colors
 # todo Henry
 """
@@ -347,7 +335,6 @@ Issues:
 - however, when it inherits Button, it doesn't change color (current) - try swtich to BoxLayout
 - displaying all row_Ann_vals with RecycleView
 """
->>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
 # https://stackoverflow.com/questions/58862489/how-can-i-call-an-on-pre-enter-function-in-kivy-for-my-root-screen
 # randomize colors https://www.youtube.com/watch?v=OkW-1uzP5Og
 # import random
@@ -425,7 +412,7 @@ class CCButton(BoxLayout):  # If this inherits Button, no overlap but it crashes
         # check for non-empty list i.e. file selected and change button text
         if self.rowAnn_val_color:
             self.ids.color_button.background_color = str(self.rowAnn_val_color)
-<<<<<<< HEAD
+
         print(self.rowAnn_val_color) #todo: remove
 
         # # Add to hourglass params #todo
@@ -441,7 +428,6 @@ class CCButton(BoxLayout):  # If this inherits Button, no overlap but it crashes
 # Color wheel popup from Kivy, returns Hex code
 class ColorPopup(Popup):
     load = ObjectProperty()
-=======
         print(self.rowAnn_val_color)
 
 # Make Groups (now called Feature Sets) tab ---
@@ -550,7 +536,17 @@ class FeatureTab2(BoxLayout):
 class FeatureTab2Label(BoxLayout):
     id_featuretab2 = StringProperty()
     label_text = StringProperty()
->>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
+    # TODO use to update kivy
+    def update_row_info(self):
+        key_vals = {
+            'Feature': self.ids.feature.text,
+            'StdParam': "" if self.ids.std_parameter.text == "Standard Parameter (required)" else self.ids.std_parameter.text,
+            'AltParam': "" if self.ids.alt_parameter.text == "Alternative Parameter" else self.ids.alt_parameter.text,
+        }
+        # Update existing feature
+        p.feature_parameters['Feature' == self.ids.feature.text] = key_vals
+        # Print
+        print(p.feature_parameters['Feature' == self.ids.feature.text])
 
     # TODO use to update kivy
     def update_row_info(self):
@@ -606,7 +602,6 @@ class SpinnerLabel(Label): #todo make this class and add it :D ???
 
 # Adv options ---
 class AdvancedOptions(Widget):
-<<<<<<< HEAD
     # Initialization function, clock updates every 5 seconds
     def __init__(self, **kwargs):
         super(AdvancedOptions, self).__init__(**kwargs)
@@ -626,8 +621,7 @@ class AdvancedOptions(Widget):
         p.surv_status_column = self.ids.surv_status_column  # vital status/event column in rowAnn
         p.do_impute = self.ids.do_impute  # run imputed version in parallel?
         p.impute_with_mean = self.ids.impute_with_mean  # percent +/- around mean to impute missing values
-=======
->>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
+
     pass
 
 class RunHourglass(Widget):
