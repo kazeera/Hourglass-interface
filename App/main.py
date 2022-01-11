@@ -50,7 +50,11 @@ class hourglassParameters():
     feature_parameters = [] # list of dict objects for parameters for each feature and comma-delimited list: {'Feature': "", 'StdParam':"", 'AltParam':""}
 
     # Customize Colors tab
+<<<<<<< HEAD
     color_palette = []
+=======
+
+>>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
 
     # Advanced Options tab
     correlation_method = "pearson" # default correlation method for correlation plot
@@ -69,7 +73,10 @@ class hourglassParameters():
     colann2 = "NA" # feature column in colAnn (e.g. Gene.Sym, Stain)
     # if feature_sets is not empty --
     boxplot_indiv = True # make individual boxplots
+<<<<<<< HEAD
     boxplot_overview = True  # makes overview of boxplots
+=======
+>>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
     heatmap = True # make heatmaps showing all features in all samples/patients?
     corrplot = True # make correlation plots comparing all features?
     corrscatt_overview = False # make correlation scatter plots comparing all features?
@@ -89,6 +96,8 @@ class hourglassParameters():
     def __init__(self):
         pass
 
+#
+
 class Dataset:
     datasetName = None
     mat = None  # numeric matrix
@@ -106,9 +115,13 @@ p = hourglassParameters()
 #                   {'GroupName': "B Cell Markers", 'GroupList': "Gene4,Gene5, Gene6, Gene7"},
 #                   {'GroupName': "Immune Cell Markers", 'GroupList': "B Cell Markers, T Cell Markers"},
 #                   {'GroupName': "ECM Markers", 'GroupList': "Gene24, Gene27, Gene35"}]
+<<<<<<< HEAD
 # p.comparisons_table = [{'MainComparison': "Smoker", 'Subgroup': "", 'CustomComparison': "Gene1", 'Filter': ""},
 #                       {'MainComparison': "Sex", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""},
 #                       {'MainComparison': "Cancer.Type", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}]
+=======
+# p.comparisons_table = [{'MainComparison': "Smoker", 'Subgroup': "", 'CustomComparison': "Gene1", 'Filter': ""}, {'MainComparison': "Sex", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}, {'MainComparison': "Cancer.Type", 'Subgroup': "", 'CustomComparison': "", 'Filter': ""}]
+>>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
 
 ds = Dataset()
 # dill.load_session("dataset.pkl")
@@ -202,6 +215,7 @@ class ComparisonTableRow(BoxLayout):
         p.comparisons_table = ComparisonTable.row_info_list
         print( ComparisonTable.row_info_list[int(self.id_number2)])
 
+<<<<<<< HEAD
 # Make Groups (now called Feature Sets) tab ---
 class FeatureSets(Widget):
     pass
@@ -323,6 +337,17 @@ class FeatureTab2Label(BoxLayout):
 
 
 # Colors ---------------------
+=======
+# Colors
+# todo Henry
+"""
+Colors 
+Issues:
+- color tab doesn't display all values when CCButton inherits BoxLayout but does when it inherits Button
+- however, when it inherits Button, it doesn't change color (current) - try swtich to BoxLayout
+- displaying all row_Ann_vals with RecycleView
+"""
+>>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
 # https://stackoverflow.com/questions/58862489/how-can-i-call-an-on-pre-enter-function-in-kivy-for-my-root-screen
 # randomize colors https://www.youtube.com/watch?v=OkW-1uzP5Og
 # import random
@@ -400,6 +425,7 @@ class CCButton(BoxLayout):  # If this inherits Button, no overlap but it crashes
         # check for non-empty list i.e. file selected and change button text
         if self.rowAnn_val_color:
             self.ids.color_button.background_color = str(self.rowAnn_val_color)
+<<<<<<< HEAD
         print(self.rowAnn_val_color) #todo: remove
 
         # # Add to hourglass params #todo
@@ -415,6 +441,128 @@ class CCButton(BoxLayout):  # If this inherits Button, no overlap but it crashes
 # Color wheel popup from Kivy, returns Hex code
 class ColorPopup(Popup):
     load = ObjectProperty()
+=======
+        print(self.rowAnn_val_color)
+
+# Make Groups (now called Feature Sets) tab ---
+class FeatureSets(Widget):
+    pass
+
+class FeatureTab1(BoxLayout):
+    id_number = -1
+    # Initialize list
+    row_list = []
+
+    def add_a_row(self):
+        # Update ID number
+        self.id_number += 1
+        # Make current row
+        curr_row = FeatureTab1Row(id_featuretab1=str(self.id_number))
+        # Add to list of ComparisonTableRow objects
+        self.row_list.append(curr_row)
+        # Add row widget
+        self.ids.container.add_widget(curr_row)
+        # Make a list of dict objects (dict object = row info)
+        p.feature_sets.append({'GroupName': "", 'GroupList': ""})
+
+class FeatureTab1Row(BoxLayout):
+    id_featuretab1 = StringProperty()
+
+    def update_row_info(self):
+        # Create dictionary variable to store feature subset name/list
+        key_vals = {
+            'GroupName': self.ids.group_name.text,
+            'GroupList': self.ids.group_list.text
+        }
+        # Update hourglass parameters object
+        p.feature_sets[int(self.id_featuretab1)] = key_vals
+        print(p.feature_sets[int(self.id_featuretab1)])
+
+class FeatureTab2(BoxLayout):
+    # self.colAnn_feature_col = 'Gene.Sym'  #StringProperty()  replace with correct drop down menu selection
+    row_list = []
+    id_number = -1
+
+    # Add a boxlayout with label for Gene and 2 textInputs
+    def __init__(self, **kwargs):
+        # super(FeatureTab2, self).__init__(**kwargs)
+        super().__init__(**kwargs)
+
+        # # # If list is not empty populate tab with current features
+        # if p.feature_parameters:
+        #     self.data = [{'label_text': str(x)} for x in [x['Feature'] for x in p.feature_parameters]]
+
+        # Set clock to refresh tab every 3 seconds
+        Clock.schedule_interval(self.update_clock, 3)
+
+    def update_clock(self, *args):
+        self.update_features()
+        # self.data = [{'label_text': str(x)} for x in self.features]
+
+    # Set self.features to a list of the features listed in  p.feature_sets
+    def update_features(self, *args):
+        #  Current features
+        curr = [x['Feature'] for x in p.feature_parameters]
+
+        new = []
+        for x in p.feature_sets: #FeatureTab1.row_info_list:
+            # String split by comma
+            x = x["GroupList"].split(',')
+            # Trim white space
+            x = [x_sub.strip() for x_sub in x]
+            # # Genes present in colAnn #todo get this to work colAnn_feature_col = 'Gene Sym'
+            # x = [y for y in x if y in ds.colAnn[self.ids.colAnn_feature_col].values]
+            # # Append to list if it's not in current list
+            new = new + x
+
+        # Remove empty
+        if '' in new:
+            new.remove('')
+
+        # Add new features
+        to_add = [i for i in new if i not in curr]
+        # Remove features in Group Names
+        grp_names = [i['GroupName'] for i in p.feature_sets]
+        to_add = [j for j in to_add if j not in grp_names]
+
+        if to_add:
+            for f in to_add:
+                p.feature_parameters.append({'Feature': f, 'StdParam': "", 'AltParam': ""})
+                # Update ID number
+                self.id_number += 1
+                curr_row = FeatureTab2Label(label_text=f, id_featuretab2=str(self.id_number))
+                # Add to list of ComparisonTableRow objects
+                self.row_list.append(curr_row)
+                # Add row widget
+                self.ids.container.add_widget(curr_row)
+
+        # Remove features that are not found anymore
+        to_rm = list(set(curr) - set(new))
+
+        if to_rm:
+            for f in to_rm:
+                # Gets the first item from the list that matches the condition, and returns None if no item matches
+                curr_row = next((x for x in self.row_list if x.label_text == f), None)
+                self.ids.container.remove_widget(curr_row)
+                self.row_list.remove(curr_row)
+            p.feature_parameters = [d for d in p.feature_parameters if d['Feature'] not in to_rm]
+
+class FeatureTab2Label(BoxLayout):
+    id_featuretab2 = StringProperty()
+    label_text = StringProperty()
+>>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
+
+    # TODO use to update kivy
+    def update_row_info(self):
+        key_vals = {
+            'Feature': self.ids.feature.text,
+            'StdParam': "" if self.ids.std_parameter.text == "Standard Parameter (required)" else self.ids.std_parameter.text,
+            'AltParam': "" if self.ids.alt_parameter.text == "Alternative Parameter" else self.ids.alt_parameter.text,
+        }
+        # Update existing feature
+        p.feature_parameters['Feature' == self.ids.feature.text] = key_vals
+        # Print
+        print(p.feature_parameters['Feature' == self.ids.feature.text])
 
 # Custom widgets ---
 class CustomCheckbox(BoxLayout):
@@ -458,6 +606,7 @@ class SpinnerLabel(Label): #todo make this class and add it :D ???
 
 # Adv options ---
 class AdvancedOptions(Widget):
+<<<<<<< HEAD
     # Initialization function, clock updates every 5 seconds
     def __init__(self, **kwargs):
         super(AdvancedOptions, self).__init__(**kwargs)
@@ -477,6 +626,8 @@ class AdvancedOptions(Widget):
         p.surv_status_column = self.ids.surv_status_column  # vital status/event column in rowAnn
         p.do_impute = self.ids.do_impute  # run imputed version in parallel?
         p.impute_with_mean = self.ids.impute_with_mean  # percent +/- around mean to impute missing values
+=======
+>>>>>>> 5ce6b167fc719e4c8b6f94d9dce7f01308f00eee
     pass
 
 class RunHourglass(Widget):
