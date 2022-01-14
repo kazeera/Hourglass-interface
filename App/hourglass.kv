@@ -95,30 +95,34 @@
     orientation: "horizontal"
     id: id_number2
 
-    Label:
+    # Label:
         # id: id_number2
-        text: root.id_number2
+        # text: root.id_number2
         # on_press: root.remove_a_row()
 
     Spinner:
         id: main_comparison
-        font_size: app.text_size
         values: app.getRowAnnCols()
-        text: 'Comparison'
+        text: 'Main Comparison'
         ann: 'rowAnn'
+        on_text: root.update_row_info()
+
+    TextInput:
+        id: custom_comparison
+        hint_text: "Or Custom Comparison"
+        multiline: False
         on_text: root.update_row_info()
 
     Spinner:
         id: subgroup
-        font_size: app.text_size
         text: 'Subgroup'
         values: app.getRowAnnCols()
         ann: 'rowAnn'
         on_text: root.update_row_info()
 
     TextInput:
-        id: custom_comparison
-        hint_text: "Custom Comparison"
+        id: within_group
+        hint_text: 'Within Groups'
         multiline: False
         on_text: root.update_row_info()
 
@@ -127,6 +131,18 @@
         hint_text: "Filter"
         multiline: False
         on_text: root.update_row_info()
+
+    CustomCheckbox:
+        id: by_sample
+        label_text: 'By Sample'
+        check_box: True
+        font_size: app.text_size/1.5
+
+    CustomCheckbox:
+        id: by_patient
+        label_text: 'By Patient'
+        check_box: False
+        font_size: app.text_size/1.5
 
 <FeatureSets>
     TabbedPanel:
@@ -239,8 +255,8 @@
         id: color_button
         font_size: app.text_size
         text: root.button_text
-        background_normal: ''
-        background_color: root.button_color
+        background_normal: 'ffffff'
+        background_color: root.rowAnn_val_color
         on_press: root.open_popup()
 
 
@@ -264,8 +280,10 @@
 
 <CustomCheckbox>
     CheckBox:
+        size_hint: .3, 1
         active: root.check_box
     Label:
+        size_hint: .7, 1
         font_size: app.text_size
         size_hint_x: 0.6
         text_size: self.size
@@ -305,90 +323,123 @@
         size: root.width, root.height
 
         CustomSpinner:
+            id: paired_analysis_id
+            label_text: 'Paired analysis column'
+            spinner_list: app.getRowAnnCols()
+            ann: 'rowAnn'
+
+        CustomSpinner:
             id: correlation_method
-            label_text: 'Correlation Method'
+            label_text: 'Correlation method'
             initial_option: 'pearson'
             spinner_list: ["pearson", "kendall", "spearman"]
 
         CustomSpinner:
             id: pval_test
-            label_text: 'Test Method'
+            label_text: 'Test method'
             initial_option: 't.test'
             spinner_list: ["t.test", "wilcox"]
 
         CustomSpinner:
             id: pval_label
-            label_text: 'P-values Label'
+            label_text: 'p-values label'
             initial_option: 'stars'
             spinner_list: ["stars", "numbers"]
 
         CustomSpinner:
-            id: paired_analysis_id
-            label_text: 'Paired analysis column:'
-            spinner_list: app.getRowAnnCols()
-            ann: 'rowAnn'
+            id: color_gradient
+            label_text: 'Color gradient'
+            initial_option: 'RdBu'
+            spinner_list: ["RdBu", "GnBu"] #todo add all RColorBrewer palettes here
+
+        CustomCheckbox:
+            id: do_remove_outliers
+            label_text: 'Remove outliers'
+            check_box: True
 
         CustomCheckbox:
             id: do_survival_analysis
-            label_text: 'Run survival analysis - pick columns from row annotations:'
+            label_text: 'Run survival analysis'
             check_box: False
 
         CustomSpinner:
             id: surv_time_column
-            label_text: 'Survival time column:'
+            label_text: 'Survival time column'
             spinner_list: app.getRowAnnCols()
             ann: 'rowAnn'
 
         CustomSpinner:
             id: surv_status_column
-            label_text: 'Censoring status (1=censored, 2=dead) column:'
+            label_text: 'Censoring status column'
             spinner_list: app.getRowAnnCols()
             ann: 'rowAnn'
 
         GridLayout:
             cols: 2
+            Label:
+                text: 'Discrete parameters'
+                font_size: app.text_size
+            AnchorLayout:
+                TextInput:
+                    id: discrete_params
+                    size_hint: .8, .6
+                    multiline: False
+                    hint_text: 'Seperated by ","'
+        GridLayout:
+            cols: 2
             CustomCheckbox:
                 id: do_impute
-                label_text: 'Run imputed version in parallel - impute NAs % around mean = '
+                label_text: 'Run imputed version in parallel'
                 check_box: False
             AnchorLayout:
                 TextInput:
-                    size_hint: .3, .3
                     id: impute_with_mean
+                    size_hint: .8, .6
                     multiline: False
-                    hint_text: 'Enter number between 0 and 100 \nhere (inclusive). Default: 5.'
+                    hint_text: 'Enter % from 1-100. Default is 5%.'
 
 <RunHourglass>
     GridLayout:
         size: root.width, root.height
         cols: 1
 
+        Label:
+            text: 'Quality Control Plots'
+            halign: 'left'
+            font_size: app.text_size
+            color: 1,0,1,1
+
         CustomCheckbox:
-            label_text: 'Quality Control Plots:'
-            id: make_qc
-            id_parameter: 'make_qc'
+            label_text: 'By feature boxplots'
+            id: make_qc_feat
             color: 1,0,1,1
             check_box: False
-        Label:
+
+        CustomCheckbox:
+            label_text: 'By parameter boxplots'
+            id: make_qc_param
+            color: 1,0,1,1
+            check_box: False
 
         CustomSpinner:
             id: colAnn1
-            label_text: 'By.Parameter Column'
+            label_text: 'Parameter column'
             spinner_list: app.getColAnnCols()
             ann: 'colAnn'
 
         CustomSpinner:
             id: colAnn2
-            label_text: 'By.Feature Column'
+            label_text: 'Feature column'
             spinner_list: app.getColAnnCols()
             ann: 'colAnn'
 
         Label:
-            text: '"Make Groups" Plots only:'
-            halign: 'right'
-            font_size: app.text_size
-            # color: 1,0,1,1
+
         Label:
+            text: 'Feature Set Plots'
+            halign: 'left'
+            font_size: app.text_size
+            color: 1,0,1,1
 
         CustomCheckbox:
             label_text: 'Individual boxplots'
@@ -407,10 +458,8 @@
             id: corrplot
 
         CustomCheckbox:
-            label_text: 'Correlation scatter (features < 50)'
+            label_text: 'Correlation scatter'
             id: corrscatt_overview
-            id_parameter: 'corrscatt_overview'
-
 
         CustomCheckbox:
             label_text: 'p-value/fold-change heatmap'
@@ -418,7 +467,17 @@
 
         CustomCheckbox:
             label_text: 'Profile barplots'
-            id: barplot
+            id: barplot_profile
+
+        CustomCheckbox:
+            label_text: 'Heterogeneity barplots'
+            id: barplot_het
+            active: False
+
+        CustomCheckbox:
+            label_text: 'Discrete parameter barplots'
+            id: barplot_discrete
+            active: False
 
         #    text: 'Download hourglass settings'
 

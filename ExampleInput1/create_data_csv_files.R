@@ -3,7 +3,7 @@ library(kazutils)
 library(dplyr)
 
 # Make output directory
-out_dir <- create_folder("InputFiles")
+out_dir <- create_folder("csv files")
 
 # Make numeric matrix
 mat <- matrix(rnorm(400), nrow = 20, ncol = 40)

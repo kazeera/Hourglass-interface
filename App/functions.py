@@ -9,7 +9,6 @@ import pandas as pd
 def save_workspace(file="global_env"):
     dill.dump_session(file + ".pkl")
 
-
 # Load the session
 def load_workspace(file):
     dill.load_session(file + ".pkl")
@@ -18,12 +17,10 @@ def load_workspace(file):
 def list_files(folder):
     return os.listdir(folder)
 
-
 # clear all variables
 def clear_env():
     import sys
     sys.modules[__name__].__dict__.clear()
-
 
 # returns a logical (T/F) array where the key matches the index of arr
 def grepl(arr, key):
