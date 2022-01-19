@@ -14,8 +14,9 @@
                 font_size: 20
 
             TextInput:
-                id: datasetName
+                id: dataset_name
                 multiline: False
+                text: 'BySample'
                 hint_text: 'Enter Text Here'
                 font_size: 20
                 on_text: root.update_name()
@@ -70,8 +71,6 @@
 <ComparisonTable>:
 	GridLayout:
 		cols:1
-        # Label:
-        #    text: "Custom Comparison = Filter by column name of feature/gene from numeric matrix table. We recommend copying and pasting directly to avoid misspellings."
 		ScrollView:
 			GridLayout:
 				id: container
@@ -323,13 +322,7 @@
         size: root.width, root.height
 
         CustomSpinner:
-            id: paired_analysis_id
-            label_text: 'Paired analysis column'
-            spinner_list: app.getRowAnnCols()
-            ann: 'rowAnn'
-
-        CustomSpinner:
-            id: correlation_method
+            id: corr_method
             label_text: 'Correlation method'
             initial_option: 'pearson'
             spinner_list: ["pearson", "kendall", "spearman"]
@@ -350,8 +343,7 @@
             id: color_gradient
             label_text: 'Color gradient'
             initial_option: 'RdBu'
-            spinner_list: ["RdBu", "GnBu"] #todo add all RColorBrewer palettes here
-
+            spinner_list: ["RdBu","PuRd","YlGn","BrBG","PiYG","PRGn","PuOr","RdGy","RdYlBu","RdYlGn","PuBuGn","BuGn","BuPu","GnBu","OrRd","RdPu","PuBu","YlGnBu","YlOrBr","YlOrRd","Reds","Blues","Greens","Greys","Oranges","Purples","Spectral","Accent","Dark2","Paired","Pastel1","Pastel2","Set1","Set2","Set3"]
         CustomCheckbox:
             id: do_remove_outliers
             label_text: 'Remove outliers'
@@ -386,22 +378,52 @@
                     multiline: False
                     hint_text: 'Seperated by ","'
         GridLayout:
-            cols: 2
+            cols: 3
             CustomCheckbox:
                 id: do_impute
                 label_text: 'Run imputed version in parallel'
                 check_box: False
             AnchorLayout:
-                TextInput:
+                Slider:
                     id: impute_with_mean
                     size_hint: .8, .6
-                    multiline: False
-                    hint_text: 'Enter % from 1-100. Default is 5%.'
-
+                    range: 0.5, 20
+                    step: 0.5
+                    value: root.impute_val
+                    on_value: root.impute_val = self.value
+                    value_track: True
+                    value_track_color: [1, 0, 0, 1]
+                Label:
+                    text: str(impute_with_mean.value) + "% around mean (columnwise)"
+            TextInput:
+                id: slider_ti
+                size_hint: 0.2, 0.8
+                multiline: 'False'
+                input_filter: 'float'
+                text: str(root.impute_val)
+                on_text: root.impute_val = float(self.text)
 <RunHourglass>
     GridLayout:
         size: root.width, root.height
         cols: 1
+
+        CustomSpinner:
+            id: paired_id_column
+            label_text: 'Patient ID column'
+            spinner_list: app.getRowAnnCols()
+            ann: 'rowAnn'
+            
+        CustomSpinner:
+            id: param_column
+            label_text: 'Parameter column'
+            spinner_list: app.getColAnnCols()
+            ann: 'colAnn'
+
+        CustomSpinner:
+            id: feature_column
+            label_text: 'Feature column'
+            spinner_list: app.getColAnnCols()
+            ann: 'colAnn'
 
         Label:
             text: 'Quality Control Plots'
@@ -411,27 +433,15 @@
 
         CustomCheckbox:
             label_text: 'By feature boxplots'
-            id: make_qc_feat
+            id: qc_feature_boxplots
             color: 1,0,1,1
             check_box: False
 
         CustomCheckbox:
             label_text: 'By parameter boxplots'
-            id: make_qc_param
+            id: qc_param_boxplots
             color: 1,0,1,1
             check_box: False
-
-        CustomSpinner:
-            id: colAnn1
-            label_text: 'Parameter column'
-            spinner_list: app.getColAnnCols()
-            ann: 'colAnn'
-
-        CustomSpinner:
-            id: colAnn2
-            label_text: 'Feature column'
-            spinner_list: app.getColAnnCols()
-            ann: 'colAnn'
 
         Label:
 
@@ -474,19 +484,35 @@
             id: barplot_het
             active: False
 
-        CustomCheckbox:
-            label_text: 'Discrete parameter barplots'
-            id: barplot_discrete
-            active: False
-
-        #    text: 'Download hourglass settings'
-
         AnchorLayout:
             Button:
                 size_hint: .5, .8
                 text: 'Run hourglass'
                 font_size: app.text_size
                 background_color: [1, 1, 1, 0.4]
+                on_press: root.open_popup()
+
+<FolderChoosePopup>:
+    title: "Choose a folder to direct output"
+    size_hint: .9, .9
+    auto_dismiss: False
+
+    BoxLayout:
+        orientation: "vertical"
+        FileChooser:
+            id: dirchooser
+            dirselect: True
+            on_selection: root.load(dirchooser.selection)
+            FileChooserIconLayout
+
+        BoxLayout:
+            size_hint: (1, 0.1)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            spacing: 20
+            Button:
+                text: "Cancel"
+                on_release: root.dismiss()
+
 <Welcome>
     BoxLayout:
         orientation: "vertical"

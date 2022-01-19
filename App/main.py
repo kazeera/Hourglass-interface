@@ -24,21 +24,22 @@ from kivy.uix.colorpicker import ColorPicker
 from kivy.core.window import Window
 from kivy.utils import get_color_from_hex, rgba
 
+
 import pandas as pd # reading and importing dataframes for Dataset objects
 import numpy # unique()
 import random # customize colors - random chooser
 import dill # need to import pkl data (existing python environment variables)
 from functions import * # in house functions
 
+## Properties class = User specifications - update when widget values are updated
 class hourglassParameters():
-    ## Properties = User specifications
     # Data file paths
     filepath_matrix = None  # numeric matrix
     filepath_rowAnn = None  # describes rows of matrix
     filepath_colAnn = None  # describes columns of matrix
 
     # Name
-    datasetName = "Dataset"
+    dataset_name = "BySample"
 
     # Make Comparisons tab
     comparisons_table = [] # list of dict objects: {'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': ""}
@@ -51,24 +52,24 @@ class hourglassParameters():
     color_palette = []
 
     # Advanced Options tab
-    correlation_method = "pearson" # default correlation method for correlation plot
+    corr_method = "pearson" # default correlation method for correlation plot
     pval_test = "t.test" # default 2 sample statistical test
     pval_label = "stars" # default labels for p-values on box and correlation plots
     color_gradient = "RdBu"
-    paired_analysis_id = "" # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
+    paired_id_column = "" # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
     do_survival_analysis = False # perform survival analysis?
-    surv_time_column = "NA" # OS/DFS time column in rowAnn
-    surv_status_column = "NA"# vital status/event column in rowAnn
+    surv_time_column = "" # OS/DFS time column in rowAnn
+    surv_status_column = ""# vital status/event column in rowAnn
     do_impute = False # run imputed version in parallel?
     impute_with_mean = 5 # percent +/- around mean to impute missing values
     do_remove_outliers = True
     discrete_params = "" # numeric parameters that will be plotted as discrete values e.g. scores 1-4
 
     # Run hourglass tab
-    make_qc_feature = False # make quality control (qc) boxplots
-    make_qc_param = False # make quality control (qc) boxplots
-    colAnn1 = "NA" # parameter column in colAnn (e.g. Parameter, Readout)
-    colann2 = "NA" # feature column in colAnn (e.g. Gene.Sym, Stain)
+    qc_feature_boxplots = False # make quality control (qc) boxplots
+    qc_param_boxplots = False # make quality control (qc) boxplots
+    param_column = "" # parameter column in colAnn (e.g. Parameter, Readout)
+    feature_column = "" # feature column in colAnn (e.g. Gene.Sym, Stain)
     # if feature_sets is not empty --
     boxplot_indiv = True # make individual boxplots
     boxplot_overview = True # overview - combines individual boxplots into 1
@@ -78,23 +79,11 @@ class hourglassParameters():
     pval_FC_heatmap = True # make heatmaps showing fold-change and p-values for each comparison?
     barplot_profile = True # make discrete bar plots showing feature amounts in each patient/sample?
     barplot_het = True # make barplots to collapse samples by patient to see heterogeneity (het) across patients
-    barplot_discrete = True # make stacked barplots for discrete_params
-
-    # p.update_value(self, property=key, value=value)
-
-    def update_property(self, property, value):
-        # todo how to make generic function to update a python propertY?
-        # something like?
-        # self.[[property]] = value
-        # self.*property = value
-        pass
-        # also todo add this function to all fields such as textInput, it's currently only in CustomSpinner class
 
     def __init__(self):
         pass
 
 class Dataset:
-    datasetName = None
     mat = None  # numeric matrix
     rowAnn = None  # describes rows of matrix
     colAnn = None  # describes columns of matrix
@@ -105,29 +94,19 @@ class Dataset:
 # Instantiate parameters object (save variables here to input into R)
 p = hourglassParameters()
 ds = Dataset()
+
+# Import saved variables
 dill.load_session("dataset2.pkl")
+# dill.load_session("hourglassParameters_p2.pkl")
 
-# Simulate user input
-# p.feature_sets = [{'GroupName': "T Cell Markers", 'GroupList': "Gene1, Gene2, Gene3"},
-#                   {'GroupName': "B Cell Markers", 'GroupList': "Gene4,Gene5, Gene6, Gene7"},
-#                   {'GroupName': "Immune Cell Markers", 'GroupList': "B Cell Markers, T Cell Markers"},
-#                   {'GroupName': "ECM Markers", 'GroupList': "Gene24, Gene27, Gene35"}]
-
-# p.comparisons_table = [{'MainComparison': "Smoker", 'CustomComparison': "Gene1", 'Subgroup': "", 'WithinGroup': "", 'Filter': "", 'BySample': "True", 'ByPatient': "False"},
-# {'MainComparison': "Sex", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': "", 'BySample': "True", 'ByPatient': "False"},
-# {'MainComparison': "Cancer.Type", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': "", 'BySample': "True", 'ByPatient': "False"}]
-
-# list(set(ds.rowAnn["Smoker"]))
-
+# Create Welcome tab
 class Welcome(Widget):
     pass
 
-# Upload Files ---
+# Upload Files tab ---
 class UploadTable(Widget):
     def update_name(self):
-        ds.datasetName = self.ids.datasetName.text
-        ## Update dataset object
-        print_hourglass_parameter("datasetName", self.ids.datasetName)
+        p.dataset_name = self.ids.dataset_name.text
     pass
 
 class FileChoosePopup(Popup):
@@ -152,7 +131,7 @@ class UploadFilePopup(BoxLayout):
         if self.file_path:
             self.ids.upload_button.text = self.file_path
 
-        # Update parameter class
+        # Update parameter class and read in data to get info from (for mainly spinners)
         if self.id_parameter == "filepath_matrix":
             p.filepath_matrix = self.file_path
             ds.mat = read_tbl(self.file_path)
@@ -166,7 +145,7 @@ class UploadFilePopup(BoxLayout):
         # Update dataset object
         print_hourglass_parameter(self.id_parameter, self.file_path) # TODO we can update our dataset object here
 
-# Comparisons Table ---
+# Comparisons Table tab ---
 class ComparisonTable(BoxLayout):
     comp_table2 = ObjectProperty()
     id_number = -1
@@ -207,7 +186,7 @@ class ComparisonTableRow(BoxLayout):
         p.comparisons_table = ComparisonTable.row_info_list
         print(ComparisonTable.row_info_list[int(self.id_number2)])
 
-# Make Groups (now called Feature Sets) tab ---
+# Feature Sets tab ---
 class FeatureSets(Widget):
     pass
 
@@ -246,7 +225,7 @@ class FeatureTab2(BoxLayout):
     row_list = []
     id_number = -1
 
-    # Add a boxlayout with label for Gene and 2 textInputs
+    # Add a boxlayout with label for Feature and 2 textInputs
     def __init__(self, **kwargs):
         # super(FeatureTab2, self).__init__(**kwargs)
         super().__init__(**kwargs)
@@ -326,7 +305,7 @@ class FeatureTab2Label(BoxLayout):
         # Print
         print(p.feature_parameters['Feature' == self.ids.feature.text])
 
-#  Customize colors tab
+#  Customize colors tab ---
 class CustomizeColors(RecycleView):
     rowAnn_cols = []
     rowAnn_vals = []
@@ -390,10 +369,11 @@ class CustomizeColors(RecycleView):
 
             print(p.color_palette)
 
+# Customize color boxlayout for each label
 class CCBoxlayout(BoxLayout):
     rowAnn_val = StringProperty()
 
-# Button class
+# Customize color button
 class CCButton(BoxLayout):  # If this inherits Button, no overlap but it crashes when we pick color; If we make this BoxLayout, the color picker works but Value1 and Value2 overlap
     the_popup = ObjectProperty(None)
     button_text = StringProperty()
@@ -433,6 +413,7 @@ class ColorPopup(Popup):
     load = ObjectProperty()
 
 # Custom widgets ---
+# Check box
 class CustomCheckbox(BoxLayout):
     label_text = StringProperty()
     check_box = BooleanProperty()
@@ -443,6 +424,7 @@ class CustomCheckbox(BoxLayout):
         else:
             print('The checkbox', checkbox, 'is inactive')
 
+# Spinner (drop down menu)
 class CustomSpinner(BoxLayout):
     label_text = StringProperty()
     spinner_list = ListProperty()
@@ -460,6 +442,7 @@ class CustomSpinner(BoxLayout):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.update_clock, 5)
 
+    # When data is uploaded import column names from appropriate tables
     def update_clock(self, *args):
         if self.ann == 'rowAnn':
             self.spinner_list = HourglassApp.getRowAnnCols(self)
@@ -474,6 +457,9 @@ class SpinnerLabel(Label): #todo make this class and add it :D ???
 
 # Adv options ---
 class AdvancedOptions(Widget):
+    # Also p.impute_with_mean, numeric value to impute columnwise around mean for imputed analysis
+    impute_val = NumericProperty(5)
+
     # Initialization function, clock updates every 5 seconds
     def __init__(self, **kwargs):
         super(AdvancedOptions, self).__init__(**kwargs)
@@ -484,8 +470,7 @@ class AdvancedOptions(Widget):
 
     # Update hourglass_parameters class with selections from AdvancedOptions
     def update_parameters(self):
-        p.paired_analysis_id = self.ids.paired_analysis_id  # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
-        p.correlation_method = self.ids.correlation_method  # default correlation method for correlation plot
+        p.corr_method = self.ids.corr_method  # default correlation method for correlation plot
         p.pval_test = self.ids.pval_test  # default 2 sample statistical test
         p.pval_label = self.ids.pval_label  # default labels for p-values on box and correlation plots
         p.color_gradient = self.ids.color_gradient
@@ -499,6 +484,9 @@ class AdvancedOptions(Widget):
 
 
 class RunHourglass(Widget):
+    the_popup = ObjectProperty(None)
+    file_path = StringProperty()
+
     # Initialization function, clock updates every 5 seconds
     def __init__(self, **kwargs):
         super(RunHourglass, self).__init__(**kwargs)
@@ -508,10 +496,11 @@ class RunHourglass(Widget):
         self.update_parameters()
 
     def update_parameters(self):
-        p.make_qc_feat = self.ids.make_qc_feat
-        p.make_qc_param = self.ids.make_qc_param
-        p.colAnn1 = self.ids.colAnn1
-        p.colann2 = self.ids.colAnn2
+        p.paired_id_column = self.ids.paired_id_column  # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
+        p.qc_feature_boxplots = self.ids.qc_feature_boxplots
+        p.qc_param_boxplots = self.ids.qc_param_boxplots
+        p.param_column = self.ids.param_column
+        p.feature_column = self.ids.feature_column
         # if feature_sets is not empty --
         p.boxplot_indiv = self.ids.boxplot_indiv
         p.boxplot_overview = self.ids.boxplot_overview
@@ -521,10 +510,20 @@ class RunHourglass(Widget):
         p.pval_FC_heatmap = self.ids.pval_FC_heatmap
         p.barplot_profile = self.ids.barplot_profile
         p.barplot_het = self.ids.barplot_het
-        p.barplot_discrete = self.ids.barplot_discrete
 
     def runHourglass(self):
         pass  # button to  interface with R, pass hourglass parameters, table and data filepaths
+
+    def open_popup(self):
+        self.the_popup = FolderChoosePopup(load=self.load)
+        self.the_popup.open()  # write to excel file
+
+    def load(self, selection):
+        self.file_path = str(selection[0])
+        self.the_popup.dismiss() #todo
+
+class FolderChoosePopup(Popup):
+    load = ObjectProperty()
 
 def print_hourglass_parameter(key, value):
     print(key, ":", value)
