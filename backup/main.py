@@ -26,7 +26,7 @@ from kivy.utils import get_color_from_hex, rgba
 
 
 import pandas as pd # reading and importing dataframes for Dataset objects
-import numpy as np # unique()
+import numpy # unique()
 import random # customize colors - random chooser
 import dill # need to import pkl data (existing python environment variables)
 from functions import * # in house functions
@@ -39,7 +39,7 @@ class hourglassParameters():
     filepath_colAnn = None  # describes columns of matrix
 
     # Name
-    dataset_name = "Dataset1"
+    dataset_name = "BySample"
 
     # Make Comparisons tab
     comparisons_table = [] # list of dict objects: {'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': ""}
@@ -107,6 +107,7 @@ class Welcome(Widget):
 class UploadTable(Widget):
     def update_name(self):
         p.dataset_name = self.ids.dataset_name.text
+    pass
 
 class FileChoosePopup(Popup):
     load = ObjectProperty()
@@ -141,6 +142,9 @@ class UploadFilePopup(BoxLayout):
             p.filepath_matrix = self.file_path
             ds.colAnn = read_tbl(self.file_path)
 
+        # Update dataset object
+        print_hourglass_parameter(self.id_parameter, self.file_path) # TODO we can update our dataset object here
+
 # Comparisons Table tab ---
 class ComparisonTable(BoxLayout):
     comp_table2 = ObjectProperty()
@@ -168,34 +172,19 @@ class ComparisonTable(BoxLayout):
 
 class ComparisonTableRow(BoxLayout):
     id_number2 = StringProperty()
-
-    # Update hourglass parameters object according to user selection
+    # TODO use to update kivy
     def update_row_info(self):
         key_vals = {'MainComparison': "" if self.ids.subgroup.text == "MainComparison" else self.ids.main_comparison.text,
                     'CustomComparison': self.ids.custom_comparison.text,
                     'Subgroup': "" if self.ids.subgroup.text == "Subgroup" else self.ids.subgroup.text,
                     'WithinGroup': self.ids.within_group.text,
                     'Filter': self.ids.filter.text,
-                    # 'BySample': str(self.ids.by_sample.active),
-                    # 'ByPatient': str(self.ids.by_patient.active)
+                    'BySample': str(self.ids.by_sample.check_box),
+                    'ByPatient': str(self.ids.by_patient.check_box)
                     }
-        print(str(self.ids.by_patient.active))
-        ComparisonTable.row_info_list[int(self.id_number2)] = key_vals
+        ComparisonTable.row_info_list[int(self.id_number2)] = key_vals #TODO remove and just directly update/read from "p" object as seen in line below
         p.comparisons_table = ComparisonTable.row_info_list
         print(ComparisonTable.row_info_list[int(self.id_number2)])
-
-# todo
-# CustomCheckbox:
-# id: by_sample
-# label_text: 'By Sample'
-# check_box: True
-# font_size: app.text_size / 1.5
-#
-# CustomCheckbox:
-# id: by_patient
-# label_text: 'By Patient'
-# check_box: False
-# font_size: app.text_size / 1.5
 
 # Feature Sets tab ---
 class FeatureSets(Widget):
@@ -304,6 +293,7 @@ class FeatureTab2Label(BoxLayout):
     id_featuretab2 = StringProperty()
     label_text = StringProperty()
 
+    # TODO use to update kivy
     def update_row_info(self):
         key_vals = {
             'Feature': self.ids.feature.text,
@@ -337,18 +327,15 @@ class CustomizeColors(RecycleView):
             set([x["MainComparison"] for x in p.comparisons_table if x["MainComparison"] != ""] +
                 [x["Subgroup"] for x in p.comparisons_table if x["Subgroup"] != ""]))
 
+        # # Two list comprehensions
+        # self.rowAnn_vals = [[x + "-" + str(y) for y in list(set(ds.rowAnn[x]))] for x in self.rowAnn_cols if all([type(i) != int for i in list(set(ds.rowAnn[x]))])]
+
         # Get all unique variables in rowAnn columns
         # Note unique() from numpy
-        self.rowAnn_vals = [[x + "-" + str(y) for y in ds.rowAnn[x].unique()] for x in self.rowAnn_cols
-                            if all([(type(i) != int and type(i) != float) for i in ds.rowAnn[x]])] #  if np.issubdtype(ds.rowAnn[x], np.integer)]
+        self.rowAnn_vals = [[x + "-" + str(y) for y in ds.rowAnn[x].unique()] for x in self.rowAnn_cols if all([type(i) != int for i in ds.rowAnn[x].unique()])]
+
         # Check whether any main comparisons are continuous (cont) variables (vars) ie. numeric)
-        cont_vars = [x for x in self.rowAnn_cols if all([(type(i) == int) or (type(i) == float) for i in ds.rowAnn[x]])]
-
-        # todo Smoker not showing up anymore :( had to do type!=float for other number vectors like OS_time
-
-        # # Previous method:
-        # self.rowAnn_vals = [[x + "-" + str(y) for y in list(set(ds.rowAnn[x]))] for x in self.rowAnn_cols if all([type(i) != int for i in list(set(ds.rowAnn[x]))])]
-        # cont_vars = [x for x in self.rowAnn_cols if all([type(i) == int() for i in list(set(ds.rowAnn[x]))])]
+        cont_vars = [x for x in self.rowAnn_cols if all([type(i) == int for i in ds.rowAnn[x].unique()])]
 
         # If a custom_column is specified, make a set
         custom_cols = set(item["CustomComparison"] for item in p.comparisons_table if item["CustomComparison"] != "")
@@ -363,7 +350,7 @@ class CustomizeColors(RecycleView):
         if p.feature_sets:
             self.rowAnn_vals = self.rowAnn_vals + [x['GroupName'] for x in p.feature_sets]
 
-        # Update current buttons list
+        # Update current
         if self.current_vals != self.rowAnn_vals:
             self.current_vals = self.rowAnn_vals
 
@@ -379,6 +366,7 @@ class CustomizeColors(RecycleView):
             p.color_palette = {self.rowAnn_vals[i]: colors[i] for i in range(len(self.rowAnn_vals))}
             # res is {'Cancer.Type-nan': '49c7a9ff', 'Cancer.Type-Mouth': '371fd3ff', 'Cancer.Type-Stomach': '13925dff', 'Cancer.Type-Lung': '529891ff', 'Cancer.Type-Brain': 'fc97a4ff', 'Sex-X': '3734e9ff', 'Sex-F': '7a9527ff', 'Sex-M': '78207aff', 'Smoker-nan': 'b51ffbff', 'Smoker-No': 'e2554dff', 'Smoker-Yes': 'fb7c2cff', 'Custom-low': 'eeb315ff', 'Custom-intermediate': '5efabaff', 'Custom-high': '1f2516ff'}
             # >>> res['A'] is '7a5de0ff'
+
             print(p.color_palette)
 
 # Customize color boxlayout for each label
@@ -429,16 +417,12 @@ class ColorPopup(Popup):
 class CustomCheckbox(BoxLayout):
     label_text = StringProperty()
     check_box = BooleanProperty()
-    id_parameter = StringProperty()
 
-    # Initialize
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        Clock.schedule_interval(self.update_clock, 5)
-
-    # Update checkbox status
-    def update_clock(self, *args):
-        setattr(p, self.id_parameter, self.ids.chckbx.active)
+    def on_checkbox_active(checkbox, value):
+        if value:
+            print('The checkbox', checkbox, 'is active')
+        else:
+            print('The checkbox', checkbox, 'is inactive')
 
 # Spinner (drop down menu)
 class CustomSpinner(BoxLayout):
@@ -448,15 +432,15 @@ class CustomSpinner(BoxLayout):
     id_parameter = StringProperty()
     ann = StringProperty('')# todo
 
-    # Initialize
+    # Print selection to console
+    def clicked(self, key, value):
+        print_hourglass_parameter(key, value)
+        # p.update_property(self, property=key, value=value) #todo
+
+    # Update column annotations
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         Clock.schedule_interval(self.update_clock, 5)
-
-    # Update parameters object when spinner selection changes
-    def selected(self, key, value):
-        print_hourglass_parameter(key, value)
-        setattr(p, key, value)
 
     # When data is uploaded import column names from appropriate tables
     def update_clock(self, *args):
@@ -467,92 +451,68 @@ class CustomSpinner(BoxLayout):
         else:
             pass
 
+class SpinnerLabel(Label): #todo make this class and add it :D ???
+    # net:
+    pass
+
 # Adv options ---
 class AdvancedOptions(Widget):
     # Also p.impute_with_mean, numeric value to impute columnwise around mean for imputed analysis
     impute_val = NumericProperty(5)
 
-    # Update the parameters object with user text input
-    def update_discrete_params(self):
-        p.discrete_params = self.ids.discrete_params.text
+    # Initialization function, clock updates every 5 seconds
+    def __init__(self, **kwargs):
+        super(AdvancedOptions, self).__init__(**kwargs)
+        Clock.schedule_interval(self.update_clock, 5)
 
-    # Update the parameters object with impute percentage selected by user
-    def update_impute_perc(self):
-        p.impute_with_mean = self.ids.impute_with_mean.value
-# TextInput: #todo remove
-#     id: slider_ti
-#     size_hint: 0.2, 0.8
-#     multiline: 'False'
-#     input_filter: 'float'
-#     text: str(root.impute_val)
-#     on_text: root.impute_val = float(self.text)
+    def update_clock(self, *args):
+        self.update_parameters()
 
-# Run hourglass tab --
+    # Update hourglass_parameters class with selections from AdvancedOptions
+    def update_parameters(self):
+        p.corr_method = self.ids.corr_method  # default correlation method for correlation plot
+        p.pval_test = self.ids.pval_test  # default 2 sample statistical test
+        p.pval_label = self.ids.pval_label  # default labels for p-values on box and correlation plots
+        p.color_gradient = self.ids.color_gradient
+        p.do_survival_analysis = self.ids.do_survival_analysis  # perform survival analysis?
+        p.surv_time_column = self.ids.surv_time_column  # OS/DFS time column in rowAnn
+        p.surv_status_column = self.ids.surv_status_column  # vital status/event column in rowAnn
+        p.do_impute = self.ids.do_impute  # run imputed version in parallel?
+        p.impute_with_mean = self.ids.impute_with_mean  # percent +/- around mean to impute missing values
+        p.do_remove_outliers = self.ids.do_remove_outliers
+        p.discrete_params = self.ids.discrete_params
 
-class FolderChoosePopup(Popup):
-    load = ObjectProperty()
-    #todo ask Henry how folder was passed on to Runhourglass
-    def print(self, folder):
-        print(folder)
 
 class RunHourglass(Widget):
     the_popup = ObjectProperty(None)
     file_path = StringProperty()
-    filename = "dataset.xlsx"
+
+    # Initialization function, clock updates every 5 seconds
+    def __init__(self, **kwargs):
+        super(RunHourglass, self).__init__(**kwargs)
+        Clock.schedule_interval(self.update_clock, 5)
+
+    def update_clock(self, *args):
+        self.update_parameters()
+
+    def update_parameters(self):
+        p.paired_id_column = self.ids.paired_id_column  # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
+        p.qc_feature_boxplots = self.ids.qc_feature_boxplots
+        p.qc_param_boxplots = self.ids.qc_param_boxplots
+        p.param_column = self.ids.param_column
+        p.feature_column = self.ids.feature_column
+        # if feature_sets is not empty --
+        p.boxplot_indiv = self.ids.boxplot_indiv
+        p.boxplot_overview = self.ids.boxplot_overview
+        p.heatmap = self.ids.heatmap
+        p.corrplot = self.ids.corrplot
+        p.corrscatt_overview = self.ids.corrscatt_overview
+        p.pval_FC_heatmap = self.ids.pval_FC_heatmap
+        p.barplot_profile = self.ids.barplot_profile
+        p.barplot_het = self.ids.barplot_het
 
     def runHourglass(self):
-        # Convert to tables to write to Excel
-        # 1  - Comparisons
-        # Make initial dataframe
-        df1 = pd.DataFrame(p.comparisons_table)
-        # Get attributes of p object that are not hidden or already present
-        atts = [i for i in p.__dir__() if "__" not in i and i not in ['feature_sets', 'feature_parameters', 'comparisons_table', 'color_palette']]
-        print(atts)
-        # Add user selections to dataframe as new columns
-        for att in atts:
-            df1[att] = p.__getattribute__(att)
-        df1_t = df1.transpose()
-        # 2 - Color Palette
-        x = p.color_palette
-        df2 = pd.DataFrame({'Variable': [i for i in x], 'HexCode': [x[i] for i in x]})
-
-        # 3 - Feature Sets
-        df3 = pd.DataFrame(p.feature_sets)
-
-        # 4 - Feature Parameters
-        df4 = pd.DataFrame(p.feature_parameters)
-
-        #todo ask Henry 1) how to open xl file using xlsxwriter 2) make button to select folder chooser
-        # Make name of file
-        self.filename = self.file_path + "/" + p.dataset_name + ".xlsx"
-
-        # Create a Pandas Excel writer using XlsxWriter as the engine
-        writer = pd.ExcelWriter(self.filename, engine='xlsxwriter')
-
-        # Write each dataframe to a different worksheet
-        df1_t.to_excel(writer, sheet_name='Comparisons', header=False)
-        df2.to_excel(writer, sheet_name='Colors', index=False)
-        df3.to_excel(writer, sheet_name='FeatureSets', index=False)
-        df4.to_excel(writer, sheet_name='FeatureParameters', index=False)
-
-        # Close the Pandas Excel writer and output the Excel file
-        writer.save()
-
-        # ## Interface to R
-        # import rpy2
-        # from rpy2.robjects.packages import importr
-        # hourglass = importr("hourglass")
-        # hourglass.test_hourglass()
-        # # [1] "Out_dir: ."
-        # # [1] "Getwd: C:/Users/Khokha lab/Documents/GitHub/Kivy Test"
-        #
-        # hourglass.create_folder(self.file_path + "/" + p.dataset_name )
-        # # <rpy2.robjects.vectors.StrVector object at 0x000002ADA4AC6880> [RTYPES.STRSXP]
-        # # R classes: ('character',)
-        # # ['R Output']
-        #
-        # # Run hourglass in R from main function
-        # hourglass.run_from_excel(self.filename)
+        pass  # button to  interface with R, pass hourglass parameters, table and data filepaths
 
     def open_popup(self):
         self.the_popup = FolderChoosePopup(load=self.load)
@@ -561,6 +521,9 @@ class RunHourglass(Widget):
     def load(self, selection):
         self.file_path = str(selection[0])
         self.the_popup.dismiss() #todo
+
+class FolderChoosePopup(Popup):
+    load = ObjectProperty()
 
 def print_hourglass_parameter(key, value):
     print(key, ":", value)
