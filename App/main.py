@@ -24,7 +24,7 @@ from kivy.uix.colorpicker import ColorPicker
 from kivy.core.window import Window
 from kivy.utils import get_color_from_hex, rgba
 
-
+import xlsxwriter
 import pandas as pd # reading and importing dataframes for Dataset objects
 import numpy as np # unique()
 import random # customize colors - random chooser
@@ -97,7 +97,7 @@ ds = Dataset()
 
 # Import saved variables
 dill.load_session("dataset2.pkl")
-# dill.load_session("hourglassParameters_p2.pkl")
+dill.load_session("hourglassParameters_p2.pkl")
 
 # Create Welcome tab
 class Welcome(Widget):
@@ -491,23 +491,22 @@ class AdvancedOptions(Widget):
 
 class FolderChoosePopup(Popup):
     load = ObjectProperty()
-    #todo ask Henry how folder was passed on to Runhourglass
-    def print(self, folder):
-        print(folder)
-
-class RunHourglass(Widget):
-    the_popup = ObjectProperty(None)
-    file_path = StringProperty()
     filename = "dataset.xlsx"
+    file_path = "."
 
-    def runHourglass(self):
+    def print(self, file_path):
+        print(file_path)
+
+    #todo ask Henry how folder was passed on to Runhourglass
+    def create_outfile(self, selection):
+        self.file_path = str(selection[0])
         # Convert to tables to write to Excel
         # 1  - Comparisons
         # Make initial dataframe
         df1 = pd.DataFrame(p.comparisons_table)
         # Get attributes of p object that are not hidden or already present
         atts = [i for i in p.__dir__() if "__" not in i and i not in ['feature_sets', 'feature_parameters', 'comparisons_table', 'color_palette']]
-        print(atts)
+
         # Add user selections to dataframe as new columns
         for att in atts:
             df1[att] = p.__getattribute__(att)
@@ -522,10 +521,9 @@ class RunHourglass(Widget):
         # 4 - Feature Parameters
         df4 = pd.DataFrame(p.feature_parameters)
 
-        #todo ask Henry 1) how to open xl file using xlsxwriter 2) make button to select folder chooser
         # Make name of file
         self.filename = self.file_path + "/" + p.dataset_name + ".xlsx"
-
+        print(self.filename)
         # Create a Pandas Excel writer using XlsxWriter as the engine
         writer = pd.ExcelWriter(self.filename, engine='xlsxwriter')
 
@@ -538,6 +536,13 @@ class RunHourglass(Widget):
         # Close the Pandas Excel writer and output the Excel file
         writer.save()
 
+
+class RunHourglass(Widget):
+    the_popup = ObjectProperty(None)
+    # file_path = StringProperty()
+
+    def runHourglass(self, file_path):
+        pass
         # ## Interface to R
         # import rpy2
         # from rpy2.robjects.packages import importr

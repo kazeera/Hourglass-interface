@@ -492,6 +492,7 @@
                 text: 'Run hourglass'
                 font_size: app.text_size
                 background_color: [1, 0, 1, 1]
+                on_press: root.runHourglass(dirchooser.selection)
 
 <FolderChoosePopup>:
     title: "Choose a folder to direct output"
@@ -503,7 +504,6 @@
         FileChooser:
             id: dirchooser
             dirselect: True
-            # on_selection: root.load(dirchooser.selection)
             FileChooserIconLayout
 
         BoxLayout:
@@ -512,7 +512,8 @@
             spacing: 20
             Button:
                 text: "Select"
-                on_release: root.print(dirchooser.selection)
+                on_release: root.dismiss()
+                on_press: root.create_outfile(dirchooser.selection)
             Button:
                 text: "Cancel"
                 on_release: root.dismiss()
