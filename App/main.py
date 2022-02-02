@@ -24,6 +24,8 @@ from kivy.uix.colorpicker import ColorPicker
 from kivy.core.window import Window
 from kivy.utils import get_color_from_hex, rgba
 
+import rpy2
+from rpy2.robjects.packages import importr
 import xlsxwriter
 import pandas as pd # reading and importing dataframes for Dataset objects
 import numpy as np # unique()
@@ -34,7 +36,7 @@ from functions import * # in house functions
 ## Properties class = User specifications - update when widget values are updated
 class hourglassParameters():
     # Data file paths
-    filepath_matrix = None  # numeric matrix
+    filepath_Matrix = None  # numeric matrix
     filepath_rowAnn = None  # describes rows of matrix
     filepath_colAnn = None  # describes columns of matrix
 
@@ -97,7 +99,7 @@ ds = Dataset()
 
 # Import saved variables
 dill.load_session("dataset2.pkl")
-dill.load_session("hourglassParameters_p2.pkl")
+# dill.load_session("hourglassParameters_p2.pkl")
 
 # Create Welcome tab
 class Welcome(Widget):
@@ -132,13 +134,13 @@ class UploadFilePopup(BoxLayout):
 
         # Update parameter class and read in data to get info from (for mainly spinners)
         if self.id_parameter == "filepath_matrix":
-            p.filepath_matrix = self.file_path
+            p.filepath_Matrix = self.file_path
             ds.mat = read_tbl(self.file_path)
         if self.id_parameter == "filepath_rowann":
-            p.filepath_rowann = self.file_path
+            p.filepath_rowAnn = self.file_path
             ds.rowAnn = read_tbl(self.file_path)
         if self.id_parameter == "filepath_colann":
-            p.filepath_matrix = self.file_path
+            p.filepath_colAnn = self.file_path
             ds.colAnn = read_tbl(self.file_path)
 
 # Comparisons Table tab ---
@@ -159,8 +161,7 @@ class ComparisonTable(BoxLayout):
         # Add row widget
         self.ids.container.add_widget(curr_row)
         # # Make a list of dict objects (dict object = row info)
-        self.row_info_list.append({'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "",  'Filter': ""})
-
+        self.row_info_list.append({'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "",  'Filter': "", 'BySample': "", 'ByPatient': ""})
     def remove_a_row2(self):
         if len(self.row_list) > 0:
             self.ids.container.remove_widget(self.row_list[0])
@@ -169,6 +170,17 @@ class ComparisonTable(BoxLayout):
 class ComparisonTableRow(BoxLayout):
     id_number2 = StringProperty()
 
+    # Initialize
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Clock.schedule_interval(self.update_clock, 5)
+
+    # Update checkbox status
+    def update_clock(self, *args):
+        self.update_row_info()
+
+    # todo make bysample and bypatient checkbox outputs read in all caps as bools
+
     # Update hourglass parameters object according to user selection
     def update_row_info(self):
         key_vals = {'MainComparison': "" if self.ids.subgroup.text == "MainComparison" else self.ids.main_comparison.text,
@@ -176,13 +188,11 @@ class ComparisonTableRow(BoxLayout):
                     'Subgroup': "" if self.ids.subgroup.text == "Subgroup" else self.ids.subgroup.text,
                     'WithinGroup': self.ids.within_group.text,
                     'Filter': self.ids.filter.text,
-                    # 'BySample': str(self.ids.by_sample.active),
-                    # 'ByPatient': str(self.ids.by_patient.active)
+                    'BySample': str(self.ids.by_sample.active),
+                    'ByPatient': str(self.ids.by_patient.active)
                     }
-        print(str(self.ids.by_patient.active))
         ComparisonTable.row_info_list[int(self.id_number2)] = key_vals
         p.comparisons_table = ComparisonTable.row_info_list
-        print(ComparisonTable.row_info_list[int(self.id_number2)])
 
 # todo
 # CustomCheckbox:
@@ -544,13 +554,12 @@ class RunHourglass(Widget):
     def runHourglass(self, file_path):
         pass
         # ## Interface to R
-        # import rpy2
-        # from rpy2.robjects.packages import importr
+
         # hourglass = importr("hourglass")
         # hourglass.test_hourglass()
-        # # [1] "Out_dir: ."
-        # # [1] "Getwd: C:/Users/Khokha lab/Documents/GitHub/Kivy Test"
-        #
+        # [1] "Out_dir: ."
+        # [1] "Getwd: C:/Users/Khokha lab/Documents/GitHub/Kivy Test"
+
         # hourglass.create_folder(self.file_path + "/" + p.dataset_name )
         # # <rpy2.robjects.vectors.StrVector object at 0x000002ADA4AC6880> [RTYPES.STRSXP]
         # # R classes: ('character',)
