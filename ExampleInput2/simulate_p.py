@@ -1,5 +1,5 @@
 ## Properties class = User specifications - update when widget values are updated
-
+# Jan 18, 2022
 ## Properties class = User specifications - update when widget values are updated
 class hourglassParameters():
     # Data file paths
@@ -33,7 +33,6 @@ class hourglassParameters():
     impute_with_mean = 5 # percent +/- around mean to impute missing values
     do_remove_outliers = True
     discrete_params = "Het.Score" # numeric parameters that will be plotted as discrete values e.g. scores 1-4
-
     # Run hourglass tab
     qc_feature_boxplots = False # make quality control (qc) boxplots
     qc_param_boxplots = True # make quality control (qc) boxplots
@@ -77,4 +76,31 @@ p.color_palette = {'Smoker-Yes': '#5FC576ff', 'Smoker-No': '#5899E8ff',
 
 # Save python environment variable to file
 import dill
+dill.dump_session("hourglassParameters_p2.pkl")
+
+# Updated Mar13, 2022
+import dill
+dill.load_session("hourglassParameters_p2.pkl")
+
+# Reduce to 1 comparison
+p.comparisons_table = [{'MainComparison': 'Sample_Cancer_Subtype', 'CustomComparison': '', 'Subgroup': 'Smoker', 'WithinGroup': '', 'Filter': 'Sex!=X', 'BySample': 'True', 'ByPatient': 'True'}]
+# New names of elements, e.g. StdParam (old) Standard_Parameter (new)
+p.feature_parameters = [{'Feature': 'CD3', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'},
+ {'Feature': 'CD8', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'},
+ {'Feature': 'CD20', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'},
+ {'Feature': 'CD27', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'},
+ {'Feature': 'CD5', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'},
+ {'Feature': 'PDL1', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'},
+ {'Feature': 'IL6', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'},
+ {'Feature': 'SMA', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'}]
+
+# Add 'Alternative': "TRUE"
+p.feature_sets = [{'GroupName': 'TCell', 'GroupList': 'CD3,CD8', 'Alternative': "TRUE"},
+                  {'GroupName': 'BCell', 'GroupList': 'CD20, CD27, CD5, PDL1', 'Alternative': "TRUE"},
+                  {'GroupName': 'immune', 'GroupList': 'TCell, BCell', 'Alternative': "TRUE"},
+                  {'GroupName': 'all', 'GroupList': 'immune, IL6, SMA', 'Alternative': "TRUE"}]
+# New patient ID
+p.paired_id_column = "Patient_ID"
+
+# Save p object to file
 dill.dump_session("hourglassParameters_p2.pkl")
