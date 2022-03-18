@@ -26,6 +26,7 @@ from kivy.utils import get_color_from_hex, rgba
 
 import rpy2
 from rpy2.robjects.packages import importr
+import re
 import xlsxwriter
 import pandas as pd # reading and importing dataframes for Dataset objects
 import numpy as np # unique()
@@ -39,6 +40,7 @@ class hourglassParameters():
     filepath_Matrix = None  # numeric matrix
     filepath_rowAnn = None  # describes rows of matrix
     filepath_colAnn = None  # describes columns of matrix
+    outfilename = None # Path to output excel file with dataset
 
     # Name
     dataset_name = "Dataset1"
@@ -48,7 +50,7 @@ class hourglassParameters():
 
     # Feature Sets tab = Custom analysis in R (key/values)
     feature_sets = [] # list of dict objects for feature set name and comma-delimited list: {'GroupName': "", 'GroupList':""}
-    feature_parameters = [] # list of dict objects for parameters for each feature and comma-delimited list: {'Feature': "", 'StdParam':"", 'AltParam':""}
+    feature_parameters = [] # list of dict objects for parameters for each feature and comma-delimited list: {'Feature': "", 'Standard_Parameter':"", 'Alternative_Parameter':""}
 
     # Customize Colors tab
     color_palette = []
@@ -188,24 +190,11 @@ class ComparisonTableRow(BoxLayout):
                     'Subgroup': "" if self.ids.subgroup.text == "Subgroup" else self.ids.subgroup.text,
                     'WithinGroup': self.ids.within_group.text,
                     'Filter': self.ids.filter.text,
-                    'BySample': str(self.ids.by_sample.active),
-                    'ByPatient': str(self.ids.by_patient.active)
+                    'BySample': str(self.ids.by_sample.active).upper(),
+                    'ByPatient': str(self.ids.by_patient.active).upper()
                     }
         ComparisonTable.row_info_list[int(self.id_number2)] = key_vals
         p.comparisons_table = ComparisonTable.row_info_list
-
-# todo
-# CustomCheckbox:
-# id: by_sample
-# label_text: 'By Sample'
-# check_box: True
-# font_size: app.text_size / 1.5
-#
-# CustomCheckbox:
-# id: by_patient
-# label_text: 'By Patient'
-# check_box: False
-# font_size: app.text_size / 1.5
 
 # Feature Sets tab ---
 class FeatureSets(Widget):
@@ -235,7 +224,8 @@ class FeatureTab1Row(BoxLayout):
         # Create dictionary variable to store feature subset name/list
         key_vals = {
             'GroupName': self.ids.group_name.text,
-            'GroupList': self.ids.group_list.text
+            'GroupList': self.ids.group_list.text,
+            'Alternative': self.ids.alternative.active
         }
         # Update hourglass parameters object
         p.feature_sets[int(self.id_featuretab1)] = key_vals
@@ -290,7 +280,7 @@ class FeatureTab2(BoxLayout):
 
         if to_add:
             for f in to_add:
-                p.feature_parameters.append({'Feature': f, 'StdParam': "", 'AltParam': ""})
+                p.feature_parameters.append({'Feature': f, 'Standard_Parameter': "", 'Alternative_Parameter': ""})
                 # Update ID number
                 self.id_number += 1
                 curr_row = FeatureTab2Label(label_text=f, id_featuretab2=str(self.id_number))
@@ -317,8 +307,8 @@ class FeatureTab2Label(BoxLayout):
     def update_row_info(self):
         key_vals = {
             'Feature': self.ids.feature.text,
-            'StdParam': "" if self.ids.std_parameter.text == "Standard Parameter (required)" else self.ids.std_parameter.text,
-            'AltParam': "" if self.ids.alt_parameter.text == "Alternative Parameter" else self.ids.alt_parameter.text,
+            'Standard_Parameter': "" if self.ids.std_parameter.text == "Standard Parameter (required)" else self.ids.std_parameter.text,
+            'Alternative_Parameter': "" if self.ids.alt_parameter.text == "Alternative Parameter" else self.ids.alt_parameter.text,
         }
         # Update existing feature
         p.feature_parameters['Feature' == self.ids.feature.text] = key_vals
@@ -347,12 +337,16 @@ class CustomizeColors(RecycleView):
             set([x["MainComparison"] for x in p.comparisons_table if x["MainComparison"] != ""] +
                 [x["Subgroup"] for x in p.comparisons_table if x["Subgroup"] != ""]))
 
+        # filter out Main Comparison and Subgroup keywords from spinners
+        self.rowAnn_cols = [i for i in self.rowAnn_cols if i not in ['Main Comparison', 'Subgroup']]
+
         # Get all unique variables in rowAnn columns
         # Note unique() from numpy
         self.rowAnn_vals = [[x + "-" + str(y) for y in ds.rowAnn[x].unique()] for x in self.rowAnn_cols
-                            if all([(type(i) != int and type(i) != float) for i in ds.rowAnn[x]])] #  if np.issubdtype(ds.rowAnn[x], np.integer)]
+                            if ds.rowAnn[x].dtype == object]
+        self.rowAnn_vals = [x for x in self.rowAnn_vals if not str(x).endswith("-nan")]
         # Check whether any main comparisons are continuous (cont) variables (vars) ie. numeric)
-        cont_vars = [x for x in self.rowAnn_cols if all([(type(i) == int) or (type(i) == float) for i in ds.rowAnn[x]])]
+        cont_vars = [x for x in self.rowAnn_cols if ds.rowAnn[x].dtype != object]
 
         # todo Smoker not showing up anymore :( had to do type!=float for other number vectors like OS_time
 
@@ -510,6 +504,7 @@ class FolderChoosePopup(Popup):
     #todo ask Henry how folder was passed on to Runhourglass
     def create_outfile(self, selection):
         self.file_path = str(selection[0])
+        print(self.file_path)
         # Convert to tables to write to Excel
         # 1  - Comparisons
         # Make initial dataframe
@@ -532,10 +527,10 @@ class FolderChoosePopup(Popup):
         df4 = pd.DataFrame(p.feature_parameters)
 
         # Make name of file
-        self.filename = self.file_path + "/" + p.dataset_name + ".xlsx"
-        print(self.filename)
+        p.outfilename = self.file_path + "/" + p.dataset_name + ".xlsx"
+        print(p.outfilename)
         # Create a Pandas Excel writer using XlsxWriter as the engine
-        writer = pd.ExcelWriter(self.filename, engine='xlsxwriter')
+        writer = pd.ExcelWriter(p.outfilename, engine='xlsxwriter')
 
         # Write each dataframe to a different worksheet
         df1_t.to_excel(writer, sheet_name='Comparisons', header=False)
@@ -546,31 +541,38 @@ class FolderChoosePopup(Popup):
         # Close the Pandas Excel writer and output the Excel file
         writer.save()
 
+class ParameterPopup(Popup):
+    load = ObjectProperty(None)
+
+    def change_path(self, selection):
+        p.outfilename = str(selection[0])
 
 class RunHourglass(Widget):
     the_popup = ObjectProperty(None)
     # file_path = StringProperty()
 
-    def runHourglass(self, file_path):
-        pass
-        # ## Interface to R
-
-        # hourglass = importr("hourglass")
-        # hourglass.test_hourglass()
+    def runHourglass(self):
+        # Interface to R
+        print(p.outfilename)
+        hourglass = importr("Hourglass")
         # [1] "Out_dir: ."
         # [1] "Getwd: C:/Users/Khokha lab/Documents/GitHub/Kivy Test"
-
+        #
         # hourglass.create_folder(self.file_path + "/" + p.dataset_name )
         # # <rpy2.robjects.vectors.StrVector object at 0x000002ADA4AC6880> [RTYPES.STRSXP]
         # # R classes: ('character',)
         # # ['R Output']
         #
-        # # Run hourglass in R from main function
-        # hourglass.run_from_excel(self.filename)
+        # Run hourglass in R from main function
+        hourglass.run_from_excel(p.outfilename)
 
     def open_popup(self):
         self.the_popup = FolderChoosePopup(load=self.load)
         self.the_popup.open()  # write to excel file
+
+    def open_parameterPopup(self):
+        self.the_popup = ParameterPopup(load=self.load)
+        self.the_popup.open()  # select an existing excel file
 
     def load(self, selection):
         self.file_path = str(selection[0])

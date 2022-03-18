@@ -195,12 +195,20 @@
         hint_text: "Name of Group"
         multiline: False
         on_text: root.update_row_info()
+        size_hint: .5,1
 
     TextInput:
         id: group_list
         hint_text: "List of features (e.g. Gene1,Gene2,Gene3) or groups"
         on_text: root.update_row_info()
 
+    CheckBox:
+        id: alternative
+        size_hint: .3,1
+
+    Label:
+        text: "Alternative"
+        size_hint: .4,1
 
 <FeatureTab2>
 	GridLayout:
@@ -486,13 +494,21 @@
                 text: 'Create user output file'
                 font_size: app.text_size
                 on_press: root.open_popup()
+
+        AnchorLayout:
+            Button:
+                size_hint: .5, .8
+                text: 'Use existing spreadsheet'
+                font_size: app.text_size
+                on_press: root.open_parameterPopup()
+
         AnchorLayout:
             Button:
                 size_hint: .5, .8
                 text: 'Run hourglass'
                 font_size: app.text_size
                 background_color: [1, 0, 1, 1]
-                on_press: root.runHourglass(dirchooser.selection)
+                on_press: root.runHourglass()
 
 <FolderChoosePopup>:
     title: "Choose a folder to direct output"
@@ -518,6 +534,29 @@
                 text: "Cancel"
                 on_release: root.dismiss()
 
+<ParameterPopup>:
+    title: "Select a spreadsheet to use as dataset"
+    size_hint: .9, .9
+    auto_dismiss: False
+
+    BoxLayout:
+        orientation: "vertical"
+        FileChooser:
+            id: paramchooser
+            FileChooserIconLayout
+
+        BoxLayout:
+            size_hint: (1, 0.1)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            spacing: 20
+            Button:
+                text: "Select"
+                on_release: root.dismiss()
+                on_press: root.change_path(paramchooser.selection)
+            Button:
+                text: "Cancel"
+                on_release: root.dismiss()
+
 <Welcome>
     BoxLayout:
         orientation: "vertical"
@@ -526,7 +565,7 @@
         spacing: 20
 
         Image:
-            source: 'icons/hourglass.gif'
+            source: 'Icons/hourglass.gif'
 
         Label:
             text: 'Follow the tabs on the top to go through the workflow.'
