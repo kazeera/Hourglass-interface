@@ -1,8 +1,3 @@
-# https://www.reddit.com/r/kivy/comments/ejgfaq/accessing_functions_from_other_classes_in_kv_file/
-# http://inclem.net/2019/06/20/kivy/widget_interactions_between_python_and_kv/
-# https://kivy.org/doc/stable/api-kivy.clock.html
-
-
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
@@ -19,17 +14,14 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty, NumericProperty, StringProperty, BooleanProperty, ListProperty, DictProperty, partial
-from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, NoTransition
 from kivy.uix.colorpicker import ColorPicker
 from kivy.core.window import Window
-from kivy.utils import get_color_from_hex, rgba
 
 import rpy2
 from rpy2.robjects.packages import importr
 import re
 import xlsxwriter
 import pandas as pd # reading and importing dataframes for Dataset objects
-import numpy as np # unique()
 import random # customize colors - random chooser
 import dill # need to import pkl data (existing python environment variables)
 from functions import * # in house functions
@@ -163,7 +155,8 @@ class ComparisonTable(BoxLayout):
         # Add row widget
         self.ids.container.add_widget(curr_row)
         # # Make a list of dict objects (dict object = row info)
-        self.row_info_list.append({'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "",  'Filter': "", 'BySample': "", 'ByPatient': ""})
+        self.row_info_list.append({'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': "", 'BySample': "", 'ByPatient': ""})
+
     def remove_a_row2(self):
         if len(self.row_list) > 0:
             self.ids.container.remove_widget(self.row_list[0])
@@ -180,8 +173,6 @@ class ComparisonTableRow(BoxLayout):
     # Update checkbox status
     def update_clock(self, *args):
         self.update_row_info()
-
-    # todo make bysample and bypatient checkbox outputs read in all caps as bools
 
     # Update hourglass parameters object according to user selection
     def update_row_info(self):
@@ -229,7 +220,7 @@ class FeatureTab1Row(BoxLayout):
         }
         # Update hourglass parameters object
         p.feature_sets[int(self.id_featuretab1)] = key_vals
-        print(p.feature_sets[int(self.id_featuretab1)])
+        # print(p.feature_sets[int(self.id_featuretab1)])
 
 class FeatureTab2(BoxLayout):
     # self.colAnn_feature_col = 'Gene.Sym'  #StringProperty()  replace with correct drop down menu selection
@@ -312,8 +303,8 @@ class FeatureTab2Label(BoxLayout):
         }
         # Update existing feature
         p.feature_parameters['Feature' == self.ids.feature.text] = key_vals
-        # Print
-        print(p.feature_parameters['Feature' == self.ids.feature.text])
+        # # Print
+        # print(p.feature_parameters['Feature' == self.ids.feature.text])
 
 #  Customize colors tab ---
 class CustomizeColors(RecycleView):
@@ -336,19 +327,18 @@ class CustomizeColors(RecycleView):
         self.rowAnn_cols = list(
             set([x["MainComparison"] for x in p.comparisons_table if x["MainComparison"] != ""] +
                 [x["Subgroup"] for x in p.comparisons_table if x["Subgroup"] != ""]))
-
         # filter out Main Comparison and Subgroup keywords from spinners
         self.rowAnn_cols = [i for i in self.rowAnn_cols if i not in ['Main Comparison', 'Subgroup']]
-
         # Get all unique variables in rowAnn columns
-        # Note unique() from numpy
+        # todo Smoker not showing up anymore :( had to do type!=float for other number vectors like OS_time
         self.rowAnn_vals = [[x + "-" + str(y) for y in ds.rowAnn[x].unique()] for x in self.rowAnn_cols
                             if ds.rowAnn[x].dtype == object]
         self.rowAnn_vals = [x for x in self.rowAnn_vals if not str(x).endswith("-nan")]
         # Check whether any main comparisons are continuous (cont) variables (vars) ie. numeric)
         cont_vars = [x for x in self.rowAnn_cols if ds.rowAnn[x].dtype != object]
 
-        # todo Smoker not showing up anymore :( had to do type!=float for other number vectors like OS_time
+        # Check whether any main comparisons are continuous (cont) variables (vars) ie. numeric)
+        cont_vars = [x for x in self.rowAnn_cols if ds.rowAnn[x].dtype != object]
 
         # # Previous method:
         # self.rowAnn_vals = [[x + "-" + str(y) for y in list(set(ds.rowAnn[x]))] for x in self.rowAnn_cols if all([type(i) != int for i in list(set(ds.rowAnn[x]))])]
@@ -383,7 +373,7 @@ class CustomizeColors(RecycleView):
             p.color_palette = {self.rowAnn_vals[i]: colors[i] for i in range(len(self.rowAnn_vals))}
             # res is {'Cancer.Type-nan': '49c7a9ff', 'Cancer.Type-Mouth': '371fd3ff', 'Cancer.Type-Stomach': '13925dff', 'Cancer.Type-Lung': '529891ff', 'Cancer.Type-Brain': 'fc97a4ff', 'Sex-X': '3734e9ff', 'Sex-F': '7a9527ff', 'Sex-M': '78207aff', 'Smoker-nan': 'b51ffbff', 'Smoker-No': 'e2554dff', 'Smoker-Yes': 'fb7c2cff', 'Custom-low': 'eeb315ff', 'Custom-intermediate': '5efabaff', 'Custom-high': '1f2516ff'}
             # >>> res['A'] is '7a5de0ff'
-            print(p.color_palette)
+            # print(p.color_palette)
 
 # Customize color boxlayout for each label
 class CCBoxlayout(BoxLayout):
@@ -421,8 +411,8 @@ class CCButton(BoxLayout):  # If this inherits Button, no overlap but it crashes
             self.ids.color_button.background_color = str(self.rowAnn_val_color)
             # Update existing feature in hg parameter class
             p.color_palette[self.button_text] = self.rowAnn_val_color
-            # Print
-            print(p.color_palette)
+            # # Print
+            # print(p.color_palette)
 
 # Color wheel popup from Kivy, returns Hex code
 class ColorPopup(Popup):
@@ -459,7 +449,7 @@ class CustomSpinner(BoxLayout):
 
     # Update parameters object when spinner selection changes
     def selected(self, key, value):
-        print_hourglass_parameter(key, value)
+        # print_hourglass_parameter(key, value)
         setattr(p, key, value)
 
     # When data is uploaded import column names from appropriate tables
