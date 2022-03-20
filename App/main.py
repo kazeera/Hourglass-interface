@@ -31,6 +31,7 @@ class hourglassParameters():
     filepath_Matrix = None  # numeric matrix
     filepath_rowAnn = None  # describes rows of matrix
     filepath_colAnn = None  # describes columns of matrix
+    outfilename = None # Path to output excel file with dataset
 
     # Name
     dataset_name = "Dataset1"
@@ -174,13 +175,13 @@ class ComparisonTableRow(BoxLayout):
 
     # Update hourglass parameters object according to user selection
     def update_row_info(self):
-        key_vals = {'MainComparison': "" if self.ids.subgroup.text == "MainComparison" else self.ids.main_comparison.text,
+        key_vals = {'MainComparison': "" if self.ids.main_comparison.text == "Main Comparison" else self.ids.main_comparison.text,
                     'CustomComparison': self.ids.custom_comparison.text,
                     'Subgroup': "" if self.ids.subgroup.text == "Subgroup" else self.ids.subgroup.text,
                     'WithinGroup': self.ids.within_group.text,
                     'Filter': self.ids.filter.text,
-                    'BySample': str(self.ids.by_sample.active),
-                    'ByPatient': str(self.ids.by_patient.active)
+                    'BySample': str(self.ids.by_sample.active).upper(),
+                    'ByPatient': str(self.ids.by_patient.active).upper()
                     }
         ComparisonTable.row_info_list[int(self.id_number2)] = key_vals
         p.comparisons_table = ComparisonTable.row_info_list
@@ -189,7 +190,48 @@ class ComparisonTableRow(BoxLayout):
 class FeatureSets(Widget):
     pass
 
-class FeatureTab1(BoxLayout):
+class FeatureTab1(GridLayout):
+    pass
+
+class FeatureTab2(RecycleView):
+    features = [""]
+    def __init__(self, **kwargs):
+        super(FeatureTab2, self).__init__(**kwargs)
+        # Set clock to refresh tab every 3 seconds
+        Clock.schedule_interval(self.update_clock, 3)
+
+    def update_clock(self, *args):
+        # If the user has selected a column from colAnn for features, continue
+        if p.feature_column != "" and ds.colAnn is not None:
+            # Get new features
+            new_features = list(ds.colAnn[str(p.feature_column)].unique())
+
+            if new_features != self.features:
+                self.features = new_features
+                self.data = [{'label_text': str(x)} for x in self.features]
+
+class FeatureTab2Label(BoxLayout):
+    label_text = StringProperty()
+
+    def update_row_info(self):
+        # Create new key values pairs
+        key_vals = {
+            'Feature': self.label_text,
+            'Standard_Parameter': "" if self.ids.std_parameter.text == "Standard Parameter (required)" else self.ids.std_parameter.text,
+            'Alternative_Parameter': "" if self.ids.alt_parameter.text == "Alternative Parameter" else self.ids.alt_parameter.text,
+        }
+        # Check whether feature already exists
+        if self.label_text not in [i['Feature'] for i in p.feature_parameters]:
+            # Add new feature
+            p.feature_parameters.append(key_vals)
+        else:
+            # Update existing feature
+            p.feature_parameters['Feature' == self.label_text] = key_vals
+        # # Print
+        # print(p.feature_parameters['Feature' == self.label_text]) #todo why doesn;t this print properly? shows only first
+        # print(p.feature_parameters)
+
+class FeatureTab3(BoxLayout):
     id_number = -1
     # Initialize list
     row_list = []
@@ -198,112 +240,48 @@ class FeatureTab1(BoxLayout):
         # Update ID number
         self.id_number += 1
         # Make current row
-        curr_row = FeatureTab1Row(id_featuretab1=str(self.id_number))
+        curr_row = FeatureTab3Row(id_FeatureTab3=str(self.id_number))
         # Add to list of ComparisonTableRow objects
         self.row_list.append(curr_row)
         # Add row widget
         self.ids.container.add_widget(curr_row)
         # Make a list of dict objects (dict object = row info)
-        p.feature_sets.append({'GroupName': "", 'GroupList': ""})
+        p.feature_sets.append({'GroupName': "", 'GroupList': "", 'Alternative': False})
 
-class FeatureTab1Row(BoxLayout):
-    id_featuretab1 = StringProperty()
+    def remove_a_row2(self): #todo remove
+        if len(self.row_list) > 0:
+            self.ids.container.remove_widget(self.row_list[0])
+            # p.feature_sets.remove(p.feature_sets[0]) #p.feature_sets['GroupName' == 'A'])
+            del self.row_list[0]
+
+class FeatureTab3Row(BoxLayout):
+    id_FeatureTab3 = StringProperty()
 
     def update_row_info(self):
         # Create dictionary variable to store feature subset name/list
         key_vals = {
             'GroupName': self.ids.group_name.text,
             'GroupList': self.ids.group_list.text,
-            'Alternative': "TRUE" #todo see if this works - create checkbox
+            'Alternative': self.ids.alternative.active
         }
         # Update hourglass parameters object
-        p.feature_sets[int(self.id_featuretab1)] = key_vals
-        # print(p.feature_sets[int(self.id_featuretab1)])
+        p.feature_sets[int(self.id_FeatureTab3)] = key_vals
+        # print(p.feature_sets[int(self.id_FeatureTab3)])
 
-class FeatureTab2(BoxLayout):
-    # self.colAnn_feature_col = 'Gene.Sym'  #StringProperty()  replace with correct drop down menu selection
-    row_list = []
-    id_number = -1
+    def remove_row(self): #todo add functionality
+        pass
+        if len(FeatureTab3.row_list) > 0:
+            # # Make current row
+            # curr_row = FeatureTab2Row(id_FeatureTab3=str(45))
+            # # Add row widget
+            # self.app.root.ids.container.add_widget(curr_row)
+            # FeatureTab2.ids.container.add_widget(curr_row)
+            # FeatureTab2.ids.container.remove_widget(FeatureTab2.row_list[self.id_FeatureTab3])
+            pass
+            # App.get_running_app().app.root.ids.container.remove_widget(FeatureTab2.row_list[self.id_FeatureTab3])
 
-    # Add a boxlayout with label for Feature and 2 textInputs
-    def __init__(self, **kwargs):
-        # super(FeatureTab2, self).__init__(**kwargs)
-        super().__init__(**kwargs)
-
-        # # # If list is not empty populate tab with current features
-        # if p.feature_parameters:
-        #     self.data = [{'label_text': str(x)} for x in [x['Feature'] for x in p.feature_parameters]]
-
-        # Set clock to refresh tab every 3 seconds
-        Clock.schedule_interval(self.update_clock, 3)
-
-    def update_clock(self, *args):
-        self.update_features()
-        # self.data = [{'label_text': str(x)} for x in self.features]
-
-    # Set self.features to a list of the features listed in  p.feature_sets
-    def update_features(self, *args):
-        #  Current features
-        curr = [x['Feature'] for x in p.feature_parameters]
-
-        new = []
-        for x in p.feature_sets: #FeatureTab1.row_info_list:
-            # String split by comma
-            x = x["GroupList"].split(',')
-            # Trim white space
-            x = [x_sub.strip() for x_sub in x]
-            # # Genes present in colAnn #todo get this to work colAnn_feature_col = 'Gene Sym'
-            # x = [y for y in x if y in ds.colAnn[self.ids.colAnn_feature_col].values]
-            # # Append to list if it's not in current list
-            new = new + x
-
-        # Remove empty
-        if '' in new:
-            new.remove('')
-
-        # Add new features
-        to_add = [i for i in new if i not in curr]
-        # Remove features in Group Names
-        grp_names = [i['GroupName'] for i in p.feature_sets]
-        to_add = [j for j in to_add if j not in grp_names]
-
-        if to_add:
-            for f in to_add:
-                p.feature_parameters.append({'Feature': f, 'Standard_Parameter': "", 'Alternative_Parameter': ""})
-                # Update ID number
-                self.id_number += 1
-                curr_row = FeatureTab2Label(label_text=f, id_featuretab2=str(self.id_number))
-                # Add to list of ComparisonTableRow objects
-                self.row_list.append(curr_row)
-                # Add row widget
-                self.ids.container.add_widget(curr_row)
-
-        # Remove features that are not found anymore
-        to_rm = list(set(curr) - set(new))
-
-        if to_rm:
-            for f in to_rm:
-                # Gets the first item from the list that matches the condition, and returns None if no item matches
-                curr_row = next((x for x in self.row_list if x.label_text == f), None)
-                self.ids.container.remove_widget(curr_row)
-                self.row_list.remove(curr_row)
-            p.feature_parameters = [d for d in p.feature_parameters if d['Feature'] not in to_rm]
-
-class FeatureTab2Label(BoxLayout):
-    id_featuretab2 = StringProperty()
-    label_text = StringProperty()
-
-    def update_row_info(self):
-        key_vals = {
-            'Feature': self.ids.feature.text,
-            'Standard_Parameter': "" if self.ids.std_parameter.text == "Standard Parameter (required)" else self.ids.std_parameter.text,
-            'Alternative_Parameter': "" if self.ids.alt_parameter.text == "Alternative Parameter" else self.ids.alt_parameter.text,
-        }
-        # Update existing feature
-        p.feature_parameters['Feature' == self.ids.feature.text] = key_vals
-        # # Print
-        # print(p.feature_parameters['Feature' == self.ids.feature.text])
-
+            # p.feature_sets.remove(p.feature_sets[0]) #p.feature_sets['GroupName' == 'A'])
+            # del FeatureTab2.row_list[self.id_FeatureTab3]
 #  Customize colors tab ---
 class CustomizeColors(RecycleView):
     rowAnn_cols = []
@@ -325,21 +303,17 @@ class CustomizeColors(RecycleView):
         self.rowAnn_cols = list(
             set([x["MainComparison"] for x in p.comparisons_table if x["MainComparison"] != ""] +
                 [x["Subgroup"] for x in p.comparisons_table if x["Subgroup"] != ""]))
+
+        # Filter out Main Comparison and Subgroup keywords from spinners
         self.rowAnn_cols = [x for x in self.rowAnn_cols if x not in ["Main Comparison", "Subgroup"]]
         # Get all unique variables in rowAnn columns
-        # todo Smoker not showing up anymore :( had to do type!=float for other number vectors like OS_time
         self.rowAnn_vals = [[x + "-" + str(y) for y in ds.rowAnn[x].unique()] for x in self.rowAnn_cols
                             if ds.rowAnn[x].dtype == object]
-        # print(self.rowAnn_vals)
-        # print([x for x in self.rowAnn_vals if not str(x).endswith('-nan')])
-
+        # Remove nan??
+        self.rowAnn_vals = [x for x in self.rowAnn_vals if not str(x).endswith("-nan")]
 
         # Check whether any main comparisons are continuous (cont) variables (vars) ie. numeric)
         cont_vars = [x for x in self.rowAnn_cols if ds.rowAnn[x].dtype != object]
-
-        # # Previous method:
-        # self.rowAnn_vals = [[x + "-" + str(y) for y in list(set(ds.rowAnn[x]))] for x in self.rowAnn_cols if all([type(i) != int for i in list(set(ds.rowAnn[x]))])]
-        # cont_vars = [x for x in self.rowAnn_cols if all([type(i) == int() for i in list(set(ds.rowAnn[x]))])]
 
         # If a custom_column is specified, make a set
         custom_cols = set(item["CustomComparison"] for item in p.comparisons_table if item["CustomComparison"] != "")
@@ -347,12 +321,9 @@ class CustomizeColors(RecycleView):
         # If this set has a length greater than 0, append the levels (low/int/high) values to values list
         if (len(custom_cols) > 0) | (len(cont_vars) > 0):
             self.rowAnn_vals.append(["Custom-" + x for x in ["low", "intermediate", "high"]])
+
         # Unlist list of lists
         self.rowAnn_vals = [item for sublist in self.rowAnn_vals for item in sublist]
-
-        # Add groups from feature sets if applicable
-        if p.feature_sets:
-            self.rowAnn_vals = self.rowAnn_vals + [x['GroupName'] for x in p.feature_sets]
 
         # Update current buttons list
         if self.current_vals != self.rowAnn_vals:
@@ -361,7 +332,7 @@ class CustomizeColors(RecycleView):
             # Regenerate RecycleView tab
             self.data = [{'rowAnn_val': str(i)} for i in self.rowAnn_vals]
 
-            # DO NOT DO THIS - ALWAYS CHANGES # Make color palette for rowAnn_vals (unique color for each value)
+            # Make color palette for rowAnn_vals (unique color for each value) - #todo color changes when there are two many variables e.g. Sample ID
             colors = []
             # Make a list of unique colors
             for i in range(len(self.rowAnn_vals)):
@@ -442,7 +413,7 @@ class CustomSpinner(BoxLayout):
     # Initialize
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        Clock.schedule_interval(self.update_clock, 5)
+        Clock.schedule_interval(self.update_clock, 3)
 
     # Update parameters object when spinner selection changes
     def selected(self, key, value):
@@ -455,6 +426,8 @@ class CustomSpinner(BoxLayout):
             self.spinner_list = HourglassApp.getRowAnnCols(self)
         elif self.ann == 'colAnn':
             self.spinner_list = HourglassApp.getColAnnCols(self)
+        elif self.ann == 'paramsFeat':
+            self.spinner_list = HourglassApp.getParamsFeature(self, *args)
         else:
             pass
 
@@ -470,25 +443,16 @@ class AdvancedOptions(Widget):
     # Update the parameters object with impute percentage selected by user
     def update_impute_perc(self):
         p.impute_with_mean = self.ids.impute_with_mean.value
-# TextInput: #todo remove
-#     id: slider_ti
-#     size_hint: 0.2, 0.8
-#     multiline: 'False'
-#     input_filter: 'float'
-#     text: str(root.impute_val)
-#     on_text: root.impute_val = float(self.text)
-
+        
 # Run hourglass tab --
-
 class FolderChoosePopup(Popup):
     load = ObjectProperty()
-    filename = "dataset.xlsx"
     file_path = "."
 
     def print(self, file_path):
         print(file_path)
 
-    #todo ask Henry how folder was passed on to Runhourglass
+    # Convert all user input into dataframes and create excel file output
     def create_outfile(self, selection):
         self.file_path = str(selection[0])
         # Convert to tables to write to Excel
@@ -513,9 +477,10 @@ class FolderChoosePopup(Popup):
         df4 = pd.DataFrame(p.feature_parameters)
 
         # Make name of file
-        self.filename = self.file_path + "/" + p.dataset_name + ".xlsx"
+        p.outfilename = self.file_path + "/" + p.dataset_name + ".xlsx"
+        print(p.outfilename)
         # Create a Pandas Excel writer using XlsxWriter as the engine
-        writer = pd.ExcelWriter(self.filename, engine='xlsxwriter')
+        writer = pd.ExcelWriter(p.outfilename, engine='xlsxwriter')
 
         # Write each dataframe to a different worksheet
         df1_t.to_excel(writer, sheet_name='Comparisons', header=False)
@@ -526,30 +491,38 @@ class FolderChoosePopup(Popup):
         # Close the Pandas Excel writer and output the Excel file
         writer.save()
 
+class ParameterPopup(Popup):
+    load = ObjectProperty(None)
+
+    def change_path(self, selection):
+        p.outfilename = str(selection[0])
 
 class RunHourglass(Widget):
     the_popup = ObjectProperty(None)
     # file_path = StringProperty()
 
-    def runHourglass(self, file_path):
-        pass
-        # ## Interface to R
-        # hourglass = importr("Hourglass")
-        # hourglass.test_Hourglass()
-        # # [1] "Out_dir: ."
-        # # [1] "Getwd: C:/Users/Khokha lab/Documents/GitHub/Kivy Test"
+    def runHourglass(self):
+        # Interface to R
+        print(p.outfilename)
+        hourglass = importr("Hourglass")
+        # [1] "Out_dir: ."
+        # [1] "Getwd: C:/Users/Khokha lab/Documents/GitHub/Kivy Test"
         #
         # hourglass.create_folder(self.file_path + "/" + p.dataset_name )
         # # <rpy2.robjects.vectors.StrVector object at 0x000002ADA4AC6880> [RTYPES.STRSXP]
         # # R classes: ('character',)
         # # ['R Output']
         #
-        # # Run hourglass in R from main function
-        # hourglass.run_from_excel(self.filename)
+        # Run hourglass in R from main function
+        hourglass.run_from_excel(p.outfilename)
 
     def open_popup(self):
         self.the_popup = FolderChoosePopup(load=self.load)
         self.the_popup.open()  # write to excel file
+
+    def open_parameterPopup(self):
+        self.the_popup = ParameterPopup(load=self.load)
+        self.the_popup.open()  # select an existing excel file
 
     def load(self, selection):
         self.file_path = str(selection[0])
@@ -576,6 +549,16 @@ class HourglassApp(App):
             return ""
         else:
             return [""] + list(ds.colAnn.columns.values)  # ["GeneSym", "GeneID", "Parameter"]
+
+    def getParamsFeature(self, feature):
+        if ds.colAnn is None:
+            return ""
+        else:
+            if p.param_column == "" or p.feature_column == "" or feature == "":
+                return "oops1"
+            if feature in list(ds.colAnn[p.feature_column]):
+                return list(ds.colAnn[p.param_column][ds.colAnn[p.feature_column] == feature])
+        return "oops2"
 
     def build(self):
         Window.clearcolor = (1,1,1,1)

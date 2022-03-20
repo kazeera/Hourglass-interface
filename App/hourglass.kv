@@ -1,6 +1,23 @@
 #: import Label kivy.uix.label.Label
 #: import Factory kivy.factory.Factory
 
+<Welcome>
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width, root.height
+        padding: 50
+        spacing: 20
+
+        Image:
+            source: 'Icons/hourglass.gif'
+
+        Label:
+            text: 'Follow the tabs on the top to go through the workflow.'
+            font_size: app.text_size
+        Label:
+            text: 'Hit the "Run" button at the end!'
+            font_size: app.text_size
+
 <UploadTable>
     GridLayout:
         cols: 1
@@ -22,7 +39,7 @@
 
         UploadFilePopup:
             id_parameter: 'filepath_matrix'
-            label_text: 'Numeric Matrix\nRows (samples) x columns (genes/features/parameters)'
+            label_text: 'Numeric Matrix\nRows (samples) x columns (features/parameters)'
 
         UploadFilePopup:
             id_parameter: 'filepath_rowann'
@@ -30,7 +47,7 @@
 
         UploadFilePopup:
             id_parameter: 'filepath_colann'
-            label_text: 'Column Annotations\nOptional. First column must be column names of numeric matrix.'
+            label_text: 'Column Annotations\nFirst column must be column names of numeric matrix.'
 
 <UploadFilePopup>
     id: root.id_parameter
@@ -148,15 +165,14 @@
             font_size: app.text_size/1.5
             text: 'By Patient'
 
-
 <FeatureSets>
     TabbedPanel:
         size: root.width, root.height
         do_default_tab: False
-        tab_width: 400
+        tab_width: 300
 
         TabbedPanelItem:
-            text: '1. Define Sets and Super-sets'
+            text: '1. Select Columns'
             font_size: app.text_size
             FeatureTab1:
 
@@ -165,16 +181,62 @@
             font_size: app.text_size
             FeatureTab2:
 
+        TabbedPanelItem:
+            text: '3. Define Sets'
+            font_size: app.text_size
+            FeatureTab3:
 
-<FeatureTab1>
+<FeatureTab1>:
+    cols: 1
+    Label:
+        text: 'Select columns in column annotation files'
+    CustomSpinner:
+        id_parameter: 'param_column'
+        label_text: 'Parameter column'
+        spinner_list: app.getColAnnCols()
+        ann: 'colAnn'
+
+    CustomSpinner:
+        id_parameter: 'feature_column'
+        label_text: 'Feature column'
+        spinner_list: app.getColAnnCols()
+        ann: 'colAnn'
+
+<FeatureTab2>:
+    viewclass: 'FeatureTab2Label'
+    RecycleBoxLayout:
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+
+<FeatureTab2Label>
+    id: id_FeatureTab2
+    orientation: 'horizontal'
+
+    Label:
+        text: root.label_text
+        font_size: app.text_size
+
+    Spinner:
+        id: std_parameter
+        values: app.getParamsFeature(root.label_text)
+        text: 'Standard Parameter (required)'
+        on_text: root.update_row_info()
+        ann: 'paramsFeat'
+
+    Spinner:
+        id: alt_parameter
+        values: app.getParamsFeature(root.label_text)
+        text: 'Alternative Parameter'
+        on_text: root.update_row_info()
+        ann: 'paramsFeat'
+
+
+<FeatureTab3>
 	GridLayout:
 		cols:1
-
-        Button:
-            size_hint: .5,.5
-            text: "New Group (Add a Row)"
-            on_release: root.add_a_row()
-            font_size: app.text_size
 
 		ScrollView:
 			GridLayout:
@@ -183,11 +245,22 @@
 				size_hint_y: None
 				height: self.minimum_height
 				row_force_default: True
-				row_default_height: dp(26)
+				row_default_height: dp(40)
 				font_size: app.text_size
 
+        GridLayout:
+            cols:2
+		    Button:
+                size_hint_y: .2
+                text: "New set (Add a row)"
+			    on_release: root.add_a_row()
+                font_size: app.text_size
+            Button:
+			    text: "Remove first set (Remove row)"
+			    on_release: root.remove_a_row2()
+                font_size: app.text_size
 
-<FeatureTab1Row>
+<FeatureTab3Row>
     orientation: "horizontal"
 
     TextInput:
@@ -195,44 +268,25 @@
         hint_text: "Name of Group"
         multiline: False
         on_text: root.update_row_info()
+        size_hint: .5,1
 
     TextInput:
         id: group_list
         hint_text: "List of features (e.g. Gene1,Gene2,Gene3) or groups"
         on_text: root.update_row_info()
 
-
-<FeatureTab2>
-	GridLayout:
-		cols:1
-        ScrollView:
-			GridLayout:
-				id: container
-				cols: 1
-				size_hint_y: None
-				height: self.minimum_height
-				row_force_default: True
-				row_default_height: dp(26)
-
-<FeatureTab2Label>
-    id: id_featuretab2
-    orientation: 'horizontal'
+    CheckBox:
+        id: alternative
+        size_hint: .3,1
 
     Label:
-        id: feature
-        text: root.label_text
+        text: "Alternative"
+        size_hint: .4,1
+
+    Button:
+        text: "Remove row"
+        on_release: root.remove_row()
         font_size: app.text_size
-
-    TextInput:
-        id: std_parameter
-        hint_text: "Standard Parameter (required)"
-        on_text: root.update_row_info()
-
-    TextInput:
-        id: alt_parameter
-        hint_text: "Alternative Parameter"
-        on_text: root.update_row_info()
-
 
 <CustomizeColors>
     viewclass: 'CCBoxlayout'
@@ -408,18 +462,6 @@
             label_text: 'Patient ID column'
             spinner_list: app.getRowAnnCols()
             ann: 'rowAnn'
-            
-        CustomSpinner:
-            id_parameter: 'param_column'
-            label_text: 'Parameter column'
-            spinner_list: app.getColAnnCols()
-            ann: 'colAnn'
-
-        CustomSpinner:
-            id_parameter: 'feature_column'
-            label_text: 'Feature column'
-            spinner_list: app.getColAnnCols()
-            ann: 'colAnn'
 
         Label:
             text: 'Quality Control Plots'
@@ -486,6 +528,14 @@
                 text: 'Create user output file'
                 font_size: app.text_size
                 on_press: root.open_popup()
+
+        AnchorLayout:
+            Button:
+                size_hint: .5, .8
+                text: 'Use existing spreadsheet'
+                font_size: app.text_size
+                on_press: root.open_parameterPopup()
+
         AnchorLayout:
             Button:
                 size_hint: .5, .8
@@ -518,22 +568,29 @@
                 text: "Cancel"
                 on_release: root.dismiss()
 
-<Welcome>
+<ParameterPopup>:
+    title: "Select a spreadsheet to use as dataset"
+    size_hint: .9, .9
+    auto_dismiss: False
+
     BoxLayout:
         orientation: "vertical"
-        size: root.width, root.height
-        padding: 50
-        spacing: 20
+        FileChooser:
+            id: paramchooser
+            FileChooserIconLayout
 
-        Image:
-            source: 'Icons/hourglass.gif'
+        BoxLayout:
+            size_hint: (1, 0.1)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            spacing: 20
+            Button:
+                text: "Select"
+                on_release: root.dismiss()
+                on_press: root.change_path(paramchooser.selection)
+            Button:
+                text: "Cancel"
+                on_release: root.dismiss()
 
-        Label:
-            text: 'Follow the tabs on the top to go through the workflow.'
-            font_size: app.text_size
-        Label:
-            text: 'Hit the "Run" button at the end!'
-            font_size: app.text_size
 
 <KVTabLay>
     TabbedPanel:
