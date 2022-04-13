@@ -6,9 +6,10 @@ class hourglassParameters():
     filepath_matrix = None  # numeric matrix
     filepath_rowAnn = None  # describes rows of matrix
     filepath_colAnn = None  # describes columns of matrix
+    outfilename = None
 
     # Name
-    dataset_name = "BySample"
+    dataset_name = "Example2"
 
     # Make Comparisons tab
     comparisons_table = [] # list of dict objects: {'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': ""}
@@ -27,7 +28,7 @@ class hourglassParameters():
     color_gradient = "RdBu"
     paired_id_column = "" # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
     do_survival_analysis = True # perform survival analysis?
-    surv_time_column = "OS time" # OS/DFS time column in rowAnn
+    surv_time_column = "OS_time" # OS/DFS time column in rowAnn
     surv_status_column = "Status"# vital status/event column in rowAnn
     do_impute = True # run imputed version in parallel?
     impute_with_mean = 5 # percent +/- around mean to impute missing values
@@ -55,10 +56,10 @@ class hourglassParameters():
 p = hourglassParameters()
 
 # Simulate user input
-p.feature_sets = [{'GroupName': 'TCell', 'GroupList': "CD3,CD8"},
-    {'GroupName': 'BCell', 'GroupList': "CD20, CD27, CD5, PDL1"},
-    {'GroupName': 'immune','GroupList': "TCell, BCell"},
-    {'GroupName': 'all', 'GroupList': "immune, IL6, SMA"}]
+p.feature_sets = [{'GroupName': 'TCell', 'GroupList': "CD3,CD8", 'Alternative': False},
+    {'GroupName': 'BCell', 'GroupList': "CD20, CD27, CD5, PDL1", 'Alternative': False},
+    {'GroupName': 'immune','GroupList': "TCell, BCell", 'Alternative': False},
+    {'GroupName': 'all', 'GroupList': "immune, IL6, SMA", 'Alternative': True}]
 
 p.feature_parameters  = [{'Feature': "CD3", 'StdParam': "Num.Pos.per.mm.2", 'AltParam': "Pos.Pixel.Percent"}, {'Feature': "CD8", 'StdParam': "Num.Pos.per.mm.2", 'AltParam': "Pos.Pixel.Percent"},
     {'Feature': "CD20", 'StdParam': "Num.Pos.per.mm.2", 'AltParam': "Pos.Pixel.Percent"}, {'Feature': "CD27", 'StdParam': "Num.Pos.per.mm.2", 'AltParam': "Pos.Pixel.Percent"},
@@ -95,9 +96,9 @@ p.feature_parameters = [{'Feature': 'CD3', 'Standard_Parameter': 'Num.Pos.per.mm
  {'Feature': 'SMA', 'Standard_Parameter': 'Num.Pos.per.mm.2', 'Alternative_Parameter': 'Pos.Pixel.Percent'}]
 
 # Add 'Alternative': "TRUE"
-p.feature_sets = [{'GroupName': 'TCell', 'GroupList': 'CD3,CD8', 'Alternative': "TRUE"},
-                  {'GroupName': 'BCell', 'GroupList': 'CD20, CD27, CD5, PDL1', 'Alternative': "TRUE"},
-                  {'GroupName': 'immune', 'GroupList': 'TCell, BCell', 'Alternative': "TRUE"},
+p.feature_sets = [{'GroupName': 'TCell', 'GroupList': 'CD3,CD8', 'Alternative': "FALSE"},
+                  {'GroupName': 'BCell', 'GroupList': 'CD20, CD27, CD5, PDL1', 'Alternative': "FALSE"},
+                  {'GroupName': 'immune', 'GroupList': 'TCell, BCell', 'Alternative': "FALSE"},
                   {'GroupName': 'all', 'GroupList': 'immune, IL6, SMA', 'Alternative': "TRUE"}]
 # New patient ID
 p.paired_id_column = "Patient_ID"

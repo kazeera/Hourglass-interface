@@ -1,4 +1,4 @@
-,Feature,Parameter,isNumeric,Parameter_of_interest
+,Stain,Parameter,isNumeric,Parameter_of_interest
 CD20_Area,CD20,Area,TRUE,FALSE
 CD20_Het.Score,CD20,Het.Score,TRUE,TRUE
 CD20_Negative.Percent,CD20,Negative.Percent,TRUE,TRUE

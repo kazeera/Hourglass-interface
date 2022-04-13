@@ -1,5 +1,50 @@
 #: import Label kivy.uix.label.Label
 #: import Factory kivy.factory.Factory
+<Popup>
+    title_size: app.text_size
+
+<Label>
+    font_size: app.text_size
+
+<TextInput>
+    font_size: app.text_size-7
+
+<Button>
+    font_size: app.text_size
+
+<TabbedPanelHeader>:
+    # background_normal: 'blue.png'
+    background_down: 'Icons/teal.jpg'
+    font_size: app.text_size
+
+<CustomCheckbox>
+    CheckBox:
+        id: chckbx
+        size_hint: .3, 1
+        active: root.check_box
+
+    Label:
+        size_hint: .7, 1
+        size_hint_x: 0.6
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        text: root.label_text
+
+<MyOption@SpinnerOption>:
+    font_size: app.text_size
+
+<CustomSpinner>
+    Label:
+        text: root.label_text
+    AnchorLayout:
+        Spinner:
+            size_hint: .8, .9
+            id: spinner
+            text: root.initial_option
+            option_cls: Factory.get("MyOption")
+            values: root.spinner_list
+            on_text: root.selected(root.id_parameter, spinner.text)
 
 <Welcome>
     BoxLayout:
@@ -13,10 +58,8 @@
 
         Label:
             text: 'Follow the tabs on the top to go through the workflow.'
-            font_size: app.text_size
         Label:
             text: 'Hit the "Run" button at the end!'
-            font_size: app.text_size
 
 <UploadTable>
     GridLayout:
@@ -28,40 +71,37 @@
 
             Label:
                 text: 'Name of Dataset'
-                font_size: 20
 
             TextInput:
                 id: dataset_name
                 multiline: False
                 hint_text: 'Enter Text Here'
-                font_size: 20
                 on_text: root.update_name()
+                font_size: app.text_size
 
         UploadFilePopup:
             id_parameter: 'filepath_matrix'
-            label_text: 'Numeric Matrix\nRows (samples) x columns (features/parameters)'
+            label_text: 'Numeric Matrix\n'#Rows (samples) x columns (features/parameters)'
 
         UploadFilePopup:
-            id_parameter: 'filepath_rowann'
-            label_text: 'Row Annotations\nFirst column must be row names of numeric matrix.'
+            id_parameter: 'filepath_rowAnn'
+            label_text: 'Row Annotations\n'#First column must be row names of numeric matrix.'
 
         UploadFilePopup:
-            id_parameter: 'filepath_colann'
-            label_text: 'Column Annotations\nFirst column must be column names of numeric matrix.'
+            id_parameter: 'filepath_colAnn'
+            label_text: 'Column Annotations'#\nFirst column must be column names of numeric matrix.'
 
 <UploadFilePopup>
     id: root.id_parameter
 
     Label:
-        text_size: self.size
-        font_size: 20
+        text_size: self.size    
         halign: 'center'
         valign: 'middle'
         text: root.label_text
     Button:
         id: upload_button
         text: root.button_text
-        font_size: app.text_size
         on_press: root.open_popup()
 
 <FileChoosePopup>:
@@ -74,7 +114,7 @@
         FileChooser:
             id: filechooser
             on_selection: root.load(filechooser.selection)
-            FileChooserIconLayout
+            FileChooserListLayout
 
         BoxLayout:
             size_hint: (1, 0.1)
@@ -94,17 +134,31 @@
 				size_hint_y: None
 				height: self.minimum_height
 				row_force_default: True
-				row_default_height: dp(26)
-        GridLayout:
-            cols:2
-		    Button:
+				row_default_height: dp(30)
+
+	    AnchorLayout:
+            Button:
+                size_hint: .5, .5
+                background_color: [1, 1, 0, 1]
 			    text: "Add a comparison (row)"
 			    on_release: root.add_a_row()
-                font_size: app.text_size
-            Button:
-			    text: "Remove first comparison (row)"
-			    on_release: root.remove_a_row2()
-                font_size: app.text_size
+
+        AnchorLayout:
+            CustomSpinner:
+                size_hint: 1, .5
+                id_parameter: 'paired_id_column'
+                label_text: 'Patient ID column'
+                spinner_list: app.getRowAnnCols()
+                ann: 'rowAnn'
+
+        # GridLayout:
+        #            cols:2
+        #		    Button:
+		#	    text: "Add a comparison (row)"
+		#	    on_release: root.add_a_row()
+        #    Button:
+		#	    text: "Remove first comparison (row)"
+		#	    on_release: root.remove_a_row2()
 
 <ComparisonTableRow>:
     orientation: "horizontal"
@@ -121,12 +175,14 @@
         text: 'Main Comparison'
         ann: 'rowAnn'
         on_text: root.update_row_info()
+        font_size: root.text_size
 
     TextInput:
         id: custom_comparison
         hint_text: "Or Custom Comparison"
         multiline: False
         on_text: root.update_row_info()
+        font_size: root.text_size
 
     Spinner:
         id: subgroup
@@ -134,18 +190,21 @@
         values: app.getRowAnnCols()
         ann: 'rowAnn'
         on_text: root.update_row_info()
+        font_size: root.text_size
 
     TextInput:
         id: within_group
         hint_text: 'Within Groups'
         multiline: False
         on_text: root.update_row_info()
+        font_size: root.text_size
 
     TextInput:
         id: filter
         hint_text: "Filter"
         multiline: False
         on_text: root.update_row_info()
+        font_size: root.text_size
 
     GridLayout:
         cols: 2
@@ -153,7 +212,7 @@
             id: by_sample
             active: True
         Label:
-            font_size: app.text_size/1.5
+            font_size: root.text_size
             text: 'By Sample'
 
     GridLayout:
@@ -162,7 +221,7 @@
             id: by_patient
             active: False
         Label:
-            font_size: app.text_size/1.5
+            font_size: root.text_size
             text: 'By Patient'
 
 <FeatureSets>
@@ -173,23 +232,20 @@
 
         TabbedPanelItem:
             text: '1. Select Columns'
-            font_size: app.text_size
             FeatureTab1:
 
         TabbedPanelItem:
             text: '2. Pick Parameters'
-            font_size: app.text_size
             FeatureTab2:
 
         TabbedPanelItem:
             text: '3. Define Sets'
-            font_size: app.text_size
             FeatureTab3:
 
 <FeatureTab1>:
     cols: 1
     Label:
-        text: 'Select columns in column annotation files'
+        text: 'Select columns from column annotation files.'
     CustomSpinner:
         id_parameter: 'param_column'
         label_text: 'Parameter column'
@@ -217,7 +273,6 @@
 
     Label:
         text: root.label_text
-        font_size: app.text_size
 
     Spinner:
         id: std_parameter
@@ -246,19 +301,17 @@
 				height: self.minimum_height
 				row_force_default: True
 				row_default_height: dp(40)
-				font_size: app.text_size
 
-        GridLayout:
-            cols:2
-		    Button:
-                size_hint_y: .2
-                text: "New set (Add a row)"
-			    on_release: root.add_a_row()
-                font_size: app.text_size
+	    AnchorLayout:
             Button:
-			    text: "Remove first set (Remove row)"
-			    on_release: root.remove_a_row2()
-                font_size: app.text_size
+                size_hint: .5, .5
+                background_color: [1, 1, 0, 1]
+			    text: "New set (Add a row)"
+			    on_release: root.add_a_row()
+
+            # Button:
+			#     text: "Remove first set (Remove row)"
+			#     on_release: root.remove_a_row2()
 
 <FeatureTab3Row>
     orientation: "horizontal"
@@ -274,19 +327,25 @@
         id: group_list
         hint_text: "List of features (e.g. Gene1,Gene2,Gene3) or groups"
         on_text: root.update_row_info()
-
-    CheckBox:
+    Spinner:
         id: alternative
+        text: root.run_alt
+        option_cls: Factory.get("MyOption")
+        values: [root.run_alt, root.dont_run_alt]
+        on_text: root.update_row_info()
         size_hint: .3,1
 
-    Label:
-        text: "Alternative"
-        size_hint: .4,1
+    # CheckBox:
+    #    id: alternative
+    #     size_hint: .3,1
 
-    Button:
-        text: "Remove row"
-        on_release: root.remove_row()
-        font_size: app.text_size
+    # Label:
+    #    text: "Alternative"
+    #    size_hint: .4,1
+
+    # Button:
+    #     text: "Remove row"
+    #     on_release: root.remove_row()
 
 <CustomizeColors>
     viewclass: 'CCBoxlayout'
@@ -304,7 +363,6 @@
 
 <CCBoxlayout>
     orientation: 'horizontal'
-
     CCButton:
         button_text: root.rowAnn_val
 
@@ -312,15 +370,13 @@
 <CCButton>
     Button:
         id: color_button
-        font_size: app.text_size
         text: root.button_text
         background_normal: 'ffffff'
         background_color: root.rowAnn_val_color
         on_press: root.open_popup()
 
-
 <ColorPopup>:
-    title: 'Pick a Color'
+    title: 'Select a color'
     size_hint: .9, .9
     id: popupcolor
     auto_dismiss: False
@@ -336,38 +392,6 @@
             text: 'Select and Close Window'
             size_hint: 1.0, 0.2
             on_press: root.load(colorpicker)
-
-<CustomCheckbox>
-    CheckBox:
-        id: chckbx
-        size_hint: .3, 1
-        active: root.check_box
-
-    Label:
-        size_hint: .7, 1
-        font_size: app.text_size
-        size_hint_x: 0.6
-        text_size: self.size
-        halign: 'left'
-        valign: 'middle'
-        text: root.label_text
-
-<MyOption@SpinnerOption>:
-    font_size: app.text_size
-
-<CustomSpinner>
-    Label:
-        text: root.label_text
-        font_size: app.text_size
-    AnchorLayout:
-        Spinner:
-            size_hint: .8, .4
-            id: spinner
-            text: root.initial_option
-            font_size: app.text_size
-            option_cls: Factory.get("MyOption")
-            values: root.spinner_list
-            on_text: root.selected(root.id_parameter, spinner.text)
 
 <AdvancedOptions>
     GridLayout:
@@ -398,12 +422,37 @@
             initial_option: 'RdBu'
             spinner_list: ["RdBu","PuRd","YlGn","BrBG","PiYG","PRGn","PuOr","RdGy","RdYlBu","RdYlGn","PuBuGn","BuGn","BuPu","GnBu","OrRd","RdPu","PuBu","YlGnBu","YlOrBr","YlOrRd","Reds","Blues","Greens","Greys","Oranges","Purples","Spectral","Accent","Dark2","Paired","Pastel1","Pastel2","Set1","Set2","Set3"]
 
+        CustomSpinner:
+            id_parameter: 'n_custom_quantiles'
+            label_text: 'Number of custom levels'
+            spinner_list: ["2","3","4","5","6"]
+            initial_option: '3'
+
+        CustomSpinner:
+            id_parameter: 'save_table'
+            label_text: 'Save ID data to file'
+            initial_option: 'FALSE'
+            spinner_list: ["FALSE", "TRUE"]
+
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Discrete parameters'
+            AnchorLayout:
+                TextInput:
+                    id: discrete_params
+                    size_hint: .8, .8
+                    multiline: False
+                    hint_text: 'Seperated by ","'
+                    on_text: root.update_discrete_params()
+
         CustomCheckbox:
             id_parameter: 'do_remove_outliers'
             label_text: 'Remove outliers'
             check_box: True
 
         CustomCheckbox:
+            size_hint: .4, .6
             id_parameter: 'do_survival_analysis'
             label_text: 'Run survival analysis'
             check_box: False
@@ -422,51 +471,32 @@
 
         GridLayout:
             cols: 2
-            Label:
-                text: 'Discrete parameters'
-                font_size: app.text_size
-            AnchorLayout:
-                TextInput:
-                    id: discrete_params
-                    size_hint: .8, .6
-                    multiline: False
-                    hint_text: 'Seperated by ","'
-                    on_text: root.update_discrete_params()
-
-        GridLayout:
-            cols: 3
             CustomCheckbox:
                 id_parameter: 'do_impute'
                 label_text: 'Run imputed version'
                 check_box: False
-            AnchorLayout:
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: str(impute_with_mean.value) + "% around mean (columnwise)"
+                    font_size: app.text_size
                 Slider:
                     id: impute_with_mean
-                    size_hint: .8, .6
-                    range: 0.5, 20
+                    range: 0.5, 10
                     step: 0.5
                     value: root.impute_val
                     on_value: root.update_impute_perc(); root.impute_val = self.value;
                     value_track: True
-                    value_track_color: [1, 0, 0, 1]
-            Label:
-                text: str(impute_with_mean.value) + "% around mean (columnwise)"
+                    value_track_color: [1, 0, 1, 1]
 
 <RunHourglass>
     GridLayout:
         size: root.width, root.height
         cols: 1
 
-        CustomSpinner:
-            id_parameter: 'paired_id_column'
-            label_text: 'Patient ID column'
-            spinner_list: app.getRowAnnCols()
-            ann: 'rowAnn'
-
         Label:
             text: 'Quality Control Plots'
             halign: 'left'
-            font_size: app.text_size
             color: 1,0,1,1
 
         CustomCheckbox:
@@ -482,11 +512,8 @@
             check_box: False
 
         Label:
-
-        Label:
             text: 'Feature Set Plots'
             halign: 'left'
-            font_size: app.text_size
             color: 1,0,1,1
 
         CustomCheckbox:
@@ -521,28 +548,47 @@
             id_parameter: 'barplot_het'
             label_text: 'Heterogeneity barplots'
             active: False
+        GridLayout:
+            cols: 2
+            AnchorLayout:
+                Button:
+                    size_hint: .9, .9 #todo switch .9 back to .5,.8
+                    text: 'Create output spreadsheet'
+                    on_press: root.open_folderchooser()
+
+            AnchorLayout:
+                Button:
+                    size_hint: .9, .9
+                    text: 'Use existing spreadsheet'
+                    on_press: root.open_spreadsheet()
 
         AnchorLayout:
             Button:
-                size_hint: .5, .8
-                text: 'Create user output file'
-                font_size: app.text_size
-                on_press: root.open_popup()
-
-        AnchorLayout:
-            Button:
-                size_hint: .5, .8
-                text: 'Use existing spreadsheet'
-                font_size: app.text_size
-                on_press: root.open_parameterPopup()
-
-        AnchorLayout:
-            Button:
-                size_hint: .5, .8
-                text: 'Run hourglass'
-                font_size: app.text_size
+                size_hint: .5, .9
+                text: 'Run Hourglass'
                 background_color: [1, 0, 1, 1]
                 on_press: root.runHourglass()
+
+<RunErrorPopup>:
+    title: 'Error Occurred!'
+    size_hint: .7, .7
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: error_label
+            text: root.error_text
+            background_color: [0,0,0,1]
+            text_size: self.width, None
+            size_hint: 1, None
+            height: self.texture_size[1]
+        BoxLayout:
+            size_hint: (1, 0.1)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            spacing: 20
+            Button:
+                size_hint: 1, 0.3
+                text: "Cancel"
+                on_release: root.dismiss()
 
 <FolderChoosePopup>:
     title: "Choose a folder to direct output"
@@ -557,7 +603,7 @@
             FileChooserIconLayout
 
         BoxLayout:
-            size_hint: (1, 0.1)
+            size_hint: 1, 0.1
             pos_hint: {'center_x': .5, 'center_y': .5}
             spacing: 20
             Button:
@@ -568,7 +614,7 @@
                 text: "Cancel"
                 on_release: root.dismiss()
 
-<ParameterPopup>:
+<ChooseExcelPopup>:
     title: "Select a spreadsheet to use as dataset"
     size_hint: .9, .9
     auto_dismiss: False
@@ -591,49 +637,78 @@
                 text: "Cancel"
                 on_release: root.dismiss()
 
-
 <KVTabLay>
     TabbedPanel:
         size: root.width, root.height
         do_default_tab: False
-        tab_width: 300
-        tab_height: 75
-        font_size: app.text_size
+        tab_width:  450 # 300
+        tab_height: 100 # todo 75
 
         TabbedPanelItem:
-            text: 'Welcome to hourglass'
-            font_size: app.text_size
+            text: 'Welcome'
             Welcome:
 
         TabbedPanelItem:
             text: 'Upload Data'
-            font_size: app.text_size
             UploadTable:
 
         TabbedPanelItem:
             text: 'Pick Comparisons'
-            font_size: app.text_size
             ComparisonTable:
 
         TabbedPanelItem:
             text: 'Define Feature Sets'
-            font_size: app.text_size
             FeatureSets:
 
         TabbedPanelItem:
+            text: 'Advanced Options'
+            AdvancedOptions:
+
+        TabbedPanelItem:
             text: 'Customize Colours'
-            font_size: app.text_size
             CustomizeColors:
 
         TabbedPanelItem:
-            text: 'Advanced Options'
-            font_size: app.text_size
-            AdvancedOptions:
-
-        # TabbedPanelItem:
-        #    text: 'Data Explorer'
-
-        TabbedPanelItem:
-            text: 'Run hourglass'
-            font_size: app.text_size
+            text: 'Run Hourglass'
             RunHourglass:
+
+[FileIconEntry@Widget]:
+    locked: False
+    path: ctx.path
+    selected: self.path in ctx.controller().selection
+    size_hint: None, None
+
+    on_touch_down: self.collide_point(*args[1].pos) and ctx.controller().entry_touched(self, args[1])
+    on_touch_up: self.collide_point(*args[1].pos) and ctx.controller().entry_released(self, args[1])
+    size: '100dp', '100dp'
+
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1 if self.selected else 0
+        BorderImage:
+            border: 8, 8, 8, 8
+            pos: root.pos
+            size: root.size
+            source: 'atlas://data/images/defaulttheme/filechooser_selected'
+
+    Image:
+        size: '48dp', '48dp'
+        source: 'atlas://data/images/defaulttheme/filechooser_%s' % ('folder' if ctx.isdir else 'file')
+        pos: root.x + dp(24), root.y + dp(40)
+
+    Label:
+        text: ctx.name
+        text_size: (root.width, self.height)
+        font_size: '16sp' # redefine fileChooserIconView to set size of folder/file names
+        halign: 'center'
+        shorten: True
+        size: '100dp', '16dp'
+        pos: root.x, root.y + dp(16)
+
+    Label:
+        text: '{}'.format(ctx.get_nice_size())
+        font_size: '14sp'
+        color: .8, .8, .8, 1
+        size: '100dp', '16sp'
+        pos: root.pos
+        halign: 'center'
