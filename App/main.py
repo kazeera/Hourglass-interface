@@ -19,6 +19,7 @@ from kivy.core.window import Window
 from kivy.base import ExceptionHandler, ExceptionManager, Logger
 
 import sys
+import time #runHourglass()
 import rpy2
 from rpy2.robjects.packages import importr
 import xlsxwriter
@@ -95,8 +96,7 @@ p = hourglassParameters()
 ds = Dataset()
 
 # Import saved variables
-
-dill.load_session("dataset2.pkl")
+# dill.load_session("dataset2.pkl")
 # dill.load_session("hourglassParameters_p2.pkl")
 
 # Create Welcome tab
@@ -489,26 +489,34 @@ class FolderChoosePopup(Popup):
         # Close the Pandas Excel writer and output the Excel file
         writer.save()
 
+# Popup class to make a popup when run Hourglass returns an error
 class RunErrorPopup(Popup):
     load = ObjectProperty(None)
     error_text = StringProperty('')
 
+    # Create error msg
     def __init__(self, error_msg, **kwargs):
         super(RunErrorPopup, self).__init__(**kwargs)
         self.error_text = error_msg
 
+# Popup class to indicate end of Hourglass run
+class FinishedPopup(Popup):
+    load = ObjectProperty(None)
+    label_text = StringProperty('')
+
+# Popup class to select an Excel spreadsheet as input into Hourglass
 class ChooseExcelPopup(Popup):
     load = ObjectProperty(None)
 
     def change_path(self, selection):
-        print(p.outfile_name )
         p.outfile_name = str(selection[0])
-        print(p.outfile_name )
 
 class RunHourglass(Widget):
     the_popup = ObjectProperty(None)
 
     def runHourglass(self):
+        start_time = time.time()
+
         # Changes: 1) in main.py and .kv, rename filepath_Matrix as filepath_matrix, filepath_rowann-->filepath_rowAnn, , filepath_colann-->filepath_colAnn, 2) delete .Reviron
         try:
             # Interface to R
@@ -534,6 +542,13 @@ class RunHourglass(Widget):
             # Run hourglass in R from main function
             Hourglass.run_from_excel(p.outfile_name)
 
+            # Time taken to run Hourglass in seconds
+            t_s = time.time() - start_time
+
+            # Create popup to indicate end
+            self.the_popup = FinishedPopup(load=self.load, label_text="%.1f" % (t_s / 60))
+            self.the_popup.open()
+
             # # Test package
             # Hourglass.test_Hourglass()
             # [1] "Out_dir: ."
@@ -543,14 +558,17 @@ class RunHourglass(Widget):
             self.the_popup = RunErrorPopup(load=self.load, error_msg="Message: %s" % (sys.exc_info()[0]))
             self.the_popup.open()
 
+    # Select a folder to direct Excel output (initiate folder chooser popup)
     def open_folderchooser(self):
         self.the_popup = FolderChoosePopup(load=self.load)
         self.the_popup.open()  # write to excel file
 
+    # Select an existing Excel spreadsheet (initiate file chooser popup)
     def open_spreadsheet(self):
         self.the_popup = ChooseExcelPopup(load=self.load)
         self.the_popup.open()  # select an existing excel file
 
+    # Load function for popups
     def load(self, selection):
         self.file_path = str(selection[0])
         self.the_popup.dismiss()

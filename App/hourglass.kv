@@ -549,12 +549,16 @@
             label_text: 'Heterogeneity barplots'
             active: False
         GridLayout:
-            cols: 2
+            cols: 3
             AnchorLayout:
                 Button:
                     size_hint: .9, .9 #todo switch .9 back to .5,.8
                     text: 'Create output spreadsheet'
                     on_press: root.open_folderchooser()
+
+            Label:
+                size_hint_x: 0.1
+                text: "or"
 
             AnchorLayout:
                 Button:
@@ -589,6 +593,18 @@
                 size_hint: 1, 0.3
                 text: "Cancel"
                 on_release: root.dismiss()
+
+<FinishedPopup>:
+    title: ''
+    size_hint: .7, .7
+    BoxLayout:
+        Label:
+            text: "Hourglass run is complete! It took %s minutes. You may now close the application or rerun Hourglass." % (root.label_text)
+            background_color: [0,0,0,1]
+            text_size: self.width, None
+            size_hint: 1, None
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            height: self.texture_size[1]
 
 <FolderChoosePopup>:
     title: "Choose a folder to direct output"
