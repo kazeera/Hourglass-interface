@@ -21,11 +21,13 @@ Hit run at the end!
 <img src="ReadMe/run_hourglass.png?raw=true" width="500"></img>
 
 ### Installation and Usage
-1. Download single exe file for Windows / dmg for MacOS in this repository.
-2. Run installer on computer.
-3. Open application and follow tabs on top (left to right) to go through workflow.
+1. Download installer file 
+  - for Windows: [download link for *.exe* file ](Executable/Hourglass.exe)
+  - for MacOS: [download link for *.dmg* file ](App/main.py) 
+3. Run installer on computer.
+4. Open application and follow tabs on top (left to right) to go through workflow.
 
-* Note: R must be installed for application to work, but working knowledge of R programming is not necessary. 
+> Note: R must be installed for application to work, but working knowledge of R programming is not necessary. 
 For first-time R users, here are installation instructions: [URL for Windows](https://datag.org/resources/documents/spring-2018/37-de-barros-installing-r-on-windows/file) and [URL for Mac](https://people.umass.edu/biep540w/pdf/HOW%20TO%20install%20R%20and%20R%20Studio%20MAC%20Users%20Fall%202020.pdf)
 
 ### What is Hourglass?
