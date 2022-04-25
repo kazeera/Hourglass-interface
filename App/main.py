@@ -434,6 +434,8 @@ class CustomSpinner(BoxLayout):
 
 # Adv options ---
 class AdvancedOptions(Widget):
+    the_popup = ObjectProperty(None)
+
     # Also p.impute_with_mean, numeric value to impute columnwise around mean for imputed analysis
     impute_val = NumericProperty(5)
 
@@ -444,7 +446,31 @@ class AdvancedOptions(Widget):
     # Update the parameters object with impute percentage selected by user
     def update_impute_perc(self):
         p.impute_with_mean = self.ids.impute_with_mean.value
-        
+
+        # Select an existing Excel spreadsheet (initiate file chooser popup)
+        def open_popup(self):
+            self.the_popup = ChooseExcelPopup(load=self.load)
+            self.the_popup.open()  # select an existing excel file
+
+        # Load function for popups
+        def load(self, selection):
+            self.file_path = str(selection[0])
+            self.the_popup.dismiss()
+
+    # Select an existing Excel spreadsheet (initiate file chooser popup)
+    def open_popup(self):
+        self.the_popup = ColorPalettePopup(load=self.load)
+        self.the_popup.open()  # select an existing excel file
+
+    # Load function for popups
+    def load(self):
+        self.the_popup.dismiss()
+
+# Popup class to indicate color palette options
+class ColorPalettePopup(Popup):
+    load = ObjectProperty(None)
+    label_text = StringProperty('')
+
 # Run hourglass tab --
 class FolderChoosePopup(Popup):
     load = ObjectProperty()

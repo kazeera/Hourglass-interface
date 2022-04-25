@@ -422,6 +422,16 @@
             initial_option: 'RdBu'
             spinner_list: ["RdBu","PuRd","YlGn","BrBG","PiYG","PRGn","PuOr","RdGy","RdYlBu","RdYlGn","PuBuGn","BuGn","BuPu","GnBu","OrRd","RdPu","PuBu","YlGnBu","YlOrBr","YlOrRd","Reds","Blues","Greens","Greys","Oranges","Purples","Spectral","Accent","Dark2","Paired","Pastel1","Pastel2","Set1","Set2","Set3"]
 
+        GridLayout:
+            cols: 2
+            AnchorLayout:
+                Button:
+                    size_hint: .7, .9
+                    text: 'See color gradients'
+                    on_press: root.open_popup()
+            Label:
+
+
         CustomSpinner:
             id_parameter: 'n_custom_quantiles'
             label_text: 'Number of custom levels'
@@ -488,6 +498,21 @@
                     on_value: root.update_impute_perc(); root.impute_val = self.value;
                     value_track: True
                     value_track_color: [1, 0, 1, 1]
+
+
+<ColorPalettePopup>:
+    title: ''
+    size_hint: .4, .8
+
+    GridLayout:
+        cols: 1
+        Image:
+            source: 'Icons/RColorBrewer_palettes.png'
+
+        Button:
+            size_hint: 0.4, 0.1
+            text: "Cancel"
+            on_release: root.dismiss()
 
 <RunHourglass>
     GridLayout:
