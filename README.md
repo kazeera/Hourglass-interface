@@ -8,7 +8,7 @@ Easily **accessible** for non-expert users.
 
 <img src="ReadMe/upload_data.png?raw=true" width="500"></img>
 
-###### **Advanced parameters** may be changed for experienced users to refine their analysis.
+**Advanced parameters** may be changed for experienced users to refine their analysis.
 
 <img src="ReadMe/advanced_options.png?raw=true" width="500"></img>
 
