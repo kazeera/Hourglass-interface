@@ -2,6 +2,19 @@
 
 This application serves as a graphical user interface to the R package, Hourglass, found [here](https://github.com/kazeera/Hourglass/).
 It is a standalone desktop application supported by python and Kivy design language.
+### Installation and Usage
+
+1. Download installer file (see table below).
+2. Run installer on computer.
+3. Open application and follow tabs on top (left to right) to go through workflow.
+
+  | Operating System | Download Link |
+  |:-|:-|
+  | Windows | [*.exe* file ](Executable/Hourglass.exe) |
+  | MacOS | [*.dmg* file ](Executable/Hourglass.exe) |
+
+> Note: R must be installed for application to work, but working knowledge of R programming is not necessary. 
+For first-time R users, here are installation instructions: [Install R for Windows](https://datag.org/resources/documents/spring-2018/37-de-barros-installing-r-on-windows/file) and [Install R for Mac](https://people.umass.edu/biep540w/pdf/HOW%20TO%20install%20R%20and%20R%20Studio%20MAC%20Users%20Fall%202020.pdf).
 
 ### Preview
 Easily **accessible** for non-expert users.
@@ -20,15 +33,6 @@ Hit run at the end!
 
 <img src="ReadMe/run_hourglass.png?raw=true" width="500"></img>
 
-### Installation and Usage
-1. Download installer file 
-  - for Windows: [download link for *.exe* file ](Executable/Hourglass.exe)
-  - for MacOS: [download link for *.dmg* file ](App/main.py) 
-3. Run installer on computer.
-4. Open application and follow tabs on top (left to right) to go through workflow.
-
-> Note: R must be installed for application to work, but working knowledge of R programming is not necessary. 
-For first-time R users, here are installation instructions: [URL for Windows](https://datag.org/resources/documents/spring-2018/37-de-barros-installing-r-on-windows/file) and [URL for Mac](https://people.umass.edu/biep540w/pdf/HOW%20TO%20install%20R%20and%20R%20Studio%20MAC%20Users%20Fall%202020.pdf)
 
 ### What is Hourglass?
 **Hourglass** is a computational toolkit that streamlines processing and visualization of massive multiparametric datasets. 
