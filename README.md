@@ -1,6 +1,6 @@
 # Hourglass Desktop Application
 
-This application serves as a graphical user interface to the R package, Hourglass found [here](https://github.com/kazeera/Hourglass/)
+This application serves as a graphical user interface to the R package, Hourglass, found [here](https://github.com/kazeera/Hourglass/).
 It is a standalone desktop application supported by python and Kivy design language.
 
 ### Preview
