@@ -1,4 +1,4 @@
-# Hourglass Desktop Application
+# Hourglass (Desktop Application)
 
 This application serves as a graphical user interface to the R package, Hourglass, found [here](https://github.com/kazeera/Hourglass/).
 It is a standalone desktop application supported by python and Kivy design language.
@@ -10,10 +10,10 @@ It is a standalone desktop application supported by python and Kivy design langu
 3. Double click file called Hourglass setup.exe to run installer (Windows). When you open this file Windows will run a setup wizard to install Hourglass.
 4. Open application and follow tabs on top (left to right) to go through workflow.
 
-  | Operating System | Download Link |
-  |:-|:-|
-  | Windows | [*.exe* file ](Executable/Hourglass.exe) |
-  | MacOS | [*.dmg* file ](Executable/Hourglass.exe) |
+  | Operating System | Download Link | Size |
+  |:-|:-|:-|
+  | Windows | [*.exe* file ](Executable/Hourglass.exe) | 250 MB |
+  | MacOS | [*.dmg* file ](Executable/Hourglass.exe) | |
 
 > Note: R must be installed for application to work, but working knowledge of R programming is not necessary. 
 For first-time R users, here are installation instructions: [Install R for Windows](https://datag.org/resources/documents/spring-2018/37-de-barros-installing-r-on-windows/file) and [Install R for Mac](https://people.umass.edu/biep540w/pdf/HOW%20TO%20install%20R%20and%20R%20Studio%20MAC%20Users%20Fall%202020.pdf).
