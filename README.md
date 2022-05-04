@@ -12,7 +12,7 @@ It is a standalone desktop application supported by python and Kivy design langu
 
   | Operating System | Download Link | Size |
   |:-|:-|:-|
-  | Windows | [*.exe* file ](Executable/Hourglass.exe) | 250 MB |
+  | Windows | [*.exe* file ](Executable/HourglassSetupv1.01.exe) | 250 MB |
   | MacOS | [*.dmg* file ](Executable/Hourglass.exe) | |
 
 > Note: R must be installed for application to work, but working knowledge of R programming is not necessary. 
