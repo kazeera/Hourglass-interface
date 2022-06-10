@@ -68,6 +68,7 @@ class hourglassParameters():
     # Run hourglass tab
     qc_feature_boxplots = False # make quality control (qc) boxplots
     qc_param_boxplots = False # make quality control (qc) boxplots
+    do_paired_analysis = False # Make patient-paired plots
     param_column = "" # parameter column in colAnn (e.g. Parameter, Readout)
     feature_column = "" # feature column in colAnn (e.g. Gene.Sym, Stain)
     # if feature_sets is not empty --
@@ -526,9 +527,10 @@ class RunErrorPopup(Popup):
         self.error_text = error_msg
 
 # Popup class to indicate end of Hourglass run
-class FinishedPopup(Popup):
+class MessagePopup(Popup):
     load = ObjectProperty(None)
     label_text = StringProperty('')
+
 
 # Popup class to select an Excel spreadsheet as input into Hourglass
 class ChooseExcelPopup(Popup):
@@ -545,7 +547,11 @@ class RunHourglass(Widget):
 
         # Changes: 1) in main.py and .kv, rename filepath_Matrix as filepath_matrix, filepath_rowann-->filepath_rowAnn, , filepath_colann-->filepath_colAnn, 2) delete .Reviron
         try:
-            # Interface to R
+            # Create popup to indicate start
+            self.the_popup = MessagePopup(load=self.load, label_text="Hourglass run in progress! You will be notified when run is complete. Closing this application will terminate the run.")
+            self.the_popup.open()
+
+            # # Interface to R
             base = importr("base")
             # Install devtools package to install Hourglass
             x = base.require("devtools")
@@ -565,14 +571,15 @@ class RunHourglass(Widget):
 
             # Import Hourglass package
             Hourglass = importr("Hourglass")
-            # Run hourglass in R from main function
-            Hourglass.run_from_excel(p.outfile_name)
-
+            # # Run hourglass in R from main function
+            # Hourglass.run_from_excel(p.outfile_name)
+            Hourglass.run_from_excel("D:/Kazeera/Niklas Krebs/20220609 Hourglass/test.xlsx")
             # Time taken to run Hourglass in seconds
             t_s = time.time() - start_time
 
             # Create popup to indicate end
-            self.the_popup = FinishedPopup(load=self.load, label_text="%.1f" % (t_s / 60))
+            self.the_popup = MessagePopup(load=self.load, label_text="Hourglass run is complete! It took %.1f minutes. You may now close the application." % (t_s / 60))
+            # self.the_popup = MessagePopup(load=self.load, label_text="%.1f" % (t_s / 60))
             self.the_popup.open()
 
             # # Test package

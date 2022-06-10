@@ -147,7 +147,7 @@
             CustomSpinner:
                 size_hint: 1, .5
                 id_parameter: 'paired_id_column'
-                label_text: 'Patient ID column'
+                label_text: 'Select Patient ID column'
                 spinner_list: app.getRowAnnCols()
                 ann: 'rowAnn'
 
@@ -536,6 +536,11 @@
             color: 1,0,1,1
             check_box: False
 
+        CustomCheckbox:
+            id_parameter: 'do_paired_analysis'
+            label_text: 'Patient-paired plots'
+            check_box: False
+
         Label:
             text: 'Feature Set Plots'
             halign: 'left'
@@ -619,17 +624,19 @@
                 text: "Cancel"
                 on_release: root.dismiss()
 
-<FinishedPopup>:
+<MessagePopup>:
     title: ''
     size_hint: .7, .7
     BoxLayout:
         Label:
-            text: "Hourglass run is complete! It took %s minutes. You may now close the application or rerun Hourglass." % (root.label_text)
+            # text: "Hourglass run is complete! It took %s minutes. You may now close the application." % (root.label_text)
+            text: root.label_text
             background_color: [0,0,0,1]
             text_size: self.width, None
             size_hint: 1, None
             pos_hint: {'center_x': .5, 'center_y': .5}
             height: self.texture_size[1]
+
 
 <FolderChoosePopup>:
     title: "Choose a folder to direct output"
