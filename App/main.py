@@ -24,9 +24,31 @@ import rpy2
 from rpy2.robjects.packages import importr
 import xlsxwriter
 import pandas as pd # reading and importing dataframes for Dataset objects
-import random # customize colors - random chooser
-import dill # need to import pkl data (existing python environment variables)
+import random # cust    omize colors - random chooser
+# import dill # need to import pkl data (existing python environment variables)
 from functions import * # in house functions
+
+
+# import sys
+import os
+import platform
+import rpy2.situation
+
+# First, set R path (important in Windows version)
+# if getattr(sys, 'frozen', False):
+    # The application is frozen
+# reset R_HOME and try to find a R installation using the fallback mechanisms
+if ("R_HOME" in os.environ):
+    del os.environ['R_HOME']
+os.environ['R_HOME'] = rpy2.situation.get_r_home()
+
+# Find the library path to R
+lib_path = rpy2.situation.get_rlib_path("R_HOME", platform.system())
+
+if (lib_path == ''):
+    print("error: install R first. add to environment varibales")
+else:
+    print("continue")
 
 ## Properties class = User specifications - update when widget values are updated
 class hourglassParameters():
@@ -41,7 +63,7 @@ class hourglassParameters():
 
     # Make Comparisons tab
     comparisons_table = []# [{'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': "", 'BySample': "", 'ByPatient': ""}] # list of dict objects: {'MainComparison': "", 'CustomComparison': "", 'Subgroup': "", 'WithinGroup': "", 'Filter': ""}
-    paired_id_column = "" # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
+    patient_id_column = "" # patient ID column name in rowAnn - only when there are multiple samples per patient in dataset
 
     # Feature Sets tab = Custom analysis in R (key/values)
     feature_sets = [] # [{'GroupName': "", 'GroupList': "", 'Alternative': ""}] # list of dict objects for feature set name and comma-delimited list:
@@ -542,16 +564,17 @@ class ChooseExcelPopup(Popup):
 class RunHourglass(Widget):
     the_popup = ObjectProperty(None)
 
+    def startup(self):
+        # Create popup to indicate start
+        self.the_popup = MessagePopup(load=self.load, label_text="Hourglass run in progress! You will be notified when run is complete. Closing this application will terminate the run.")
+        self.the_popup.open()
+
     def runHourglass(self):
         start_time = time.time()
 
         # Changes: 1) in main.py and .kv, rename filepath_Matrix as filepath_matrix, filepath_rowann-->filepath_rowAnn, , filepath_colann-->filepath_colAnn, 2) delete .Reviron
         try:
-            # Create popup to indicate start
-            self.the_popup = MessagePopup(load=self.load, label_text="Hourglass run in progress! You will be notified when run is complete. Closing this application will terminate the run.")
-            self.the_popup.open()
-
-            # # Interface to R
+            # Interface to R
             base = importr("base")
             # Install devtools package to install Hourglass
             x = base.require("devtools")
@@ -571,12 +594,15 @@ class RunHourglass(Widget):
 
             # Import Hourglass package
             Hourglass = importr("Hourglass")
+
             # # Run hourglass in R from main function
-            # Hourglass.run_from_excel(p.outfile_name)
-            Hourglass.run_from_excel("D:/Kazeera/Niklas Krebs/20220609 Hourglass/test.xlsx")
+            Hourglass.run_from_excel(p.outfile_name)
+            # Hourglass.run_from_excel("C:/Users/Khokha lab/Desktop/TEST2.xlsx")
             # Time taken to run Hourglass in seconds
             t_s = time.time() - start_time
 
+            # Close the startup popup
+            self.the_popup.dismiss()
             # Create popup to indicate end
             self.the_popup = MessagePopup(load=self.load, label_text="Hourglass run is complete! It took %.1f minutes. You may now close the application." % (t_s / 60))
             # self.the_popup = MessagePopup(load=self.load, label_text="%.1f" % (t_s / 60))

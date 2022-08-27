@@ -114,7 +114,7 @@
         FileChooser:
             id: filechooser
             on_selection: root.load(filechooser.selection)
-            FileChooserListLayout
+            FileChooserIconLayout
 
         BoxLayout:
             size_hint: (1, 0.1)
@@ -142,14 +142,6 @@
                 background_color: [1, 1, 0, 1]
 			    text: "Add a comparison (row)"
 			    on_release: root.add_a_row()
-
-        AnchorLayout:
-            CustomSpinner:
-                size_hint: 1, .5
-                id_parameter: 'paired_id_column'
-                label_text: 'Select Patient ID column'
-                spinner_list: app.getRowAnnCols()
-                ann: 'rowAnn'
 
         # GridLayout:
         #            cols:2
@@ -520,18 +512,29 @@
         cols: 1
 
         Label:
-            text: 'Quality Control Plots'
+            text: 'Required for ByPatient/paired:'
+            halign: 'left'
+            color: 1,0,1,1
+
+        CustomSpinner:
+            id_parameter: 'patient_id_column'
+            label_text: 'Select Patient ID column'
+            spinner_list: app.getRowAnnCols()
+            ann: 'rowAnn'
+
+        Label:
+            text: 'Quality Control Plots:'
             halign: 'left'
             color: 1,0,1,1
 
         CustomCheckbox:
-            label_text: 'By feature boxplots'
+            label_text: 'QC feature boxplots'
             id_parameter: 'qc_feature_boxplots'
             color: 1,0,1,1
-            check_box: False
+            check_box: True
 
         CustomCheckbox:
-            label_text: 'By parameter boxplots'
+            label_text: 'QC parameter boxplots'
             id_parameter: 'qc_param_boxplots'
             color: 1,0,1,1
             check_box: False
@@ -542,7 +545,7 @@
             check_box: False
 
         Label:
-            text: 'Feature Set Plots'
+            text: 'Feature Set Plots:'
             halign: 'left'
             color: 1,0,1,1
 
@@ -601,7 +604,9 @@
                 size_hint: .5, .9
                 text: 'Run Hourglass'
                 background_color: [1, 0, 1, 1]
-                on_press: root.runHourglass()
+                on_press: root.startup()
+                on_press: self.background_color = (1.0, 0.0, 0.0, 1.0) # red
+                on_release: root.runHourglass()
 
 <RunErrorPopup>:
     title: 'Error Occurred!'
