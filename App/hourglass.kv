@@ -30,6 +30,7 @@
         halign: 'left'
         valign: 'middle'
         text: root.label_text
+        color: root.label_color
 
 <MyOption@SpinnerOption>:
     font_size: app.text_size
@@ -436,6 +437,13 @@
             initial_option: 'FALSE'
             spinner_list: ["FALSE", "TRUE"]
 
+        CustomSpinner:
+            id_parameter: 'boxplot_log10y'
+            label_text: 'Log10 y axis for box/paired plots'
+            initial_option: 'FALSE'
+            spinner_list: ["FALSE", "TRUE"]
+
+
         GridLayout:
             cols: 2
             Label:
@@ -447,7 +455,6 @@
                     multiline: False
                     hint_text: 'Seperated by ","'
                     on_text: root.update_discrete_params()
-
         CustomCheckbox:
             id_parameter: 'do_remove_outliers'
             label_text: 'Remove outliers'
@@ -530,24 +537,25 @@
         CustomCheckbox:
             label_text: 'QC feature boxplots'
             id_parameter: 'qc_feature_boxplots'
-            color: 1,0,1,1
             check_box: True
 
         CustomCheckbox:
             label_text: 'QC parameter boxplots'
             id_parameter: 'qc_param_boxplots'
-            color: 1,0,1,1
             check_box: False
 
         CustomCheckbox:
             id_parameter: 'do_paired_analysis'
             label_text: 'Patient-paired plots'
-            check_box: False
+            check_box: True
 
         Label:
-            text: 'Feature Set Plots:'
-            halign: 'left'
-            color: 1,0,1,1
+            text: ''
+
+        CustomCheckbox:
+            id_parameter: 'feature_plots'
+            label_text: 'Feature Set Plots'
+            label_color: 1,0,1,1
 
         CustomCheckbox:
             id_parameter: 'boxplot_indiv'
@@ -580,7 +588,8 @@
         CustomCheckbox:
             id_parameter: 'barplot_het'
             label_text: 'Heterogeneity barplots'
-            active: False
+            check_box: True
+
         GridLayout:
             cols: 3
             AnchorLayout:

@@ -13,7 +13,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.popup import Popup
-from kivy.properties import ObjectProperty, NumericProperty, StringProperty, BooleanProperty, ListProperty, DictProperty, partial
+from kivy.properties import ObjectProperty, NumericProperty, StringProperty, BooleanProperty, ListProperty, ColorProperty, DictProperty, partial
 from kivy.uix.colorpicker import ColorPicker
 from kivy.core.window import Window
 from kivy.base import ExceptionHandler, ExceptionManager, Logger
@@ -85,15 +85,18 @@ class hourglassParameters():
     do_remove_outliers = True
     discrete_params = "" # numeric parameters that will be plotted as discrete values e.g. scores 1-4
     n_custom_quantiles = "3"
+    boxplot_log10y = "FALSE"
     save_table = "FALSE"
 
     # Run hourglass tab
-    qc_feature_boxplots = False # make quality control (qc) boxplots
+    qc_feature_boxplots = True # make quality control (qc) boxplots
     qc_param_boxplots = False # make quality control (qc) boxplots
-    do_paired_analysis = False # Make patient-paired plots
+    do_paired_analysis = True # Make patient-paired plots
     param_column = "" # parameter column in colAnn (e.g. Parameter, Readout)
     feature_column = "" # feature column in colAnn (e.g. Gene.Sym, Stain)
+
     # if feature_sets is not empty --
+    feature_plots = True
     boxplot_indiv = True # make individual boxplots
     boxplot_overview = True # overview - combines individual boxplots into 1
     heatmap = True # make heatmaps showing all features in all samples/patients?
@@ -416,6 +419,7 @@ class CustomCheckbox(BoxLayout):
     label_text = StringProperty()
     check_box = BooleanProperty()
     id_parameter = StringProperty()
+    label_color = ColorProperty([1,1,1,1])
 
     # Initialize
     def __init__(self, **kwargs):
