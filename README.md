@@ -1,6 +1,11 @@
 # Hourglass (Desktop Application)
 
-Hourglass is a toolkit to interrogate multiparameteric data from well-annotated patient cohorts, mainly from bioimage analysis. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
+<img src="Logo/Hourglass_logo-removebg.png?raw=true" alt="Hourglass logo" width="60"></img>
+
+Hourglass is a toolkit to interrogate multiparameteric data from well-annotated patient cohorts, mainly from bioimage analysis. 
+
+This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
+
 
 ### Installation
 
