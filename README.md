@@ -2,14 +2,12 @@
 
 <img src="Logo/Hourglass_logo-removebg.png?raw=true" alt="Hourglass logo" width="60"></img>
 
-Hourglass is a toolkit to interrogate multiparameteric data from well-annotated patient cohorts, mainly from bioimage analysis. 
-
-This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
+Hourglass is a toolkit to interrogate multiparameteric data. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
 
 
 ### Installation
 
-1. If not already installed, install the R statistical environment. Check this [URL](https://kazeera.github.io/Hourglass/installation.html) to get R.
+1. If not already installed, install the R statistical environment. Refer to this [URL](https://kazeera.github.io/Hourglass/installation.html) to get R.
 
 > Note: R must be installed for the application to work, but working knowledge of R programming is not necessary. 
 
@@ -28,7 +26,7 @@ This desktop application serves as a graphical user interface for the R package 
 **MacOS**  
 
 3. Locate the downloaded dmg file on your computer.
-4. Drag contents to the "Application" folder.
+4. Drag contents to the "Applications" folder.
 
 
 
