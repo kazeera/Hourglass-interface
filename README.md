@@ -1,22 +1,35 @@
 # Hourglass (Desktop Application)
 
-This application serves as a graphical user interface to the R package, Hourglass, found [here](https://github.com/kazeera/Hourglass/).
-It is a standalone desktop application supported by python and Kivy design language.
+Hourglass is a toolkit to interrogate multiparameteric data from well-annotated patient cohorts, mainly from bioimage analysis. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
 
-### Installation and Usage
+### Installation
 
-1. Download installer file (see table below).
-2. Locate downloaded installer file on your computer.
-3. Double click file called Hourglass setup.exe to run installer (Windows). When you open this file Windows will run a setup wizard to install Hourglass.
-4. Open application and follow tabs on top (left to right) to go through workflow.
+1. If not already installed, install the R statistical environment. Check this [URL](https://kazeera.github.io/Hourglass/installation.html) to get R.
 
-  | Operating System | Download Link | Size |
-  |:-|:-|:-|
-  | Windows | [*.exe* file ](Executable/HourglassSetupv1.01.exe) | 250 MB |
-  | MacOS | [*.dmg* file ](Executable/Hourglass.exe) | |
+> Note: R must be installed for the application to work, but working knowledge of R programming is not necessary. 
 
-> Note: R must be installed for application to work, but working knowledge of R programming is not necessary. 
-For first-time R users, here are installation instructions: [Install R for Windows](https://datag.org/resources/documents/spring-2018/37-de-barros-installing-r-on-windows/file) and [Install R for Mac](https://people.umass.edu/biep540w/pdf/HOW%20TO%20install%20R%20and%20R%20Studio%20MAC%20Users%20Fall%202020.pdf).
+2. Download file (see table below). Click on link and press file name to download.
+
+  | Operating System | Download Link | Size | Latest Version | 
+  |:-:|:-:|:-:|:-:| 
+  | Windows | [*.exe* file ](https://github.com/kazeera/Hourglass-interface/tree/main/Executables/Windows) | 108 MB | v1.03 | 
+  | MacOS | [*.dmg* file ](https://github.com/kazeera/Hourglass-interface/tree/main/Executables/MacOS) | 53 KB | v1.03 | 
+
+**Windows**  
+
+3. Locate the downloaded exe installer file on your computer.
+4. Double-click file to run and follow the instructions. Windows will run a setup wizard to install Hourglass.
+
+**MacOS**  
+
+3. Locate the downloaded dmg file on your computer.
+4. Drag contents to the "Application" folder.
+
+
+
+### How to Use
+
+Open application and follow tabs on top (left to right) to go through workflow. Refer to the complete guide: [URL](https://kazeera.github.io/Hourglass/how-to-use-the-desktop-application.html).
 
 ### Preview
 Easily **accessible** for non-expert users.
@@ -35,8 +48,6 @@ Hit run at the end!
 
 <img src="ReadMe/run_hourglass.png?raw=true" width="500"></img>
 
-### Further Reading
-* [Hourglass Documentation](https://github.com/kazeera/Hourglass-documentation/)
 
 ### What is Hourglass?
 **Hourglass** is a computational toolkit that streamlines processing and visualization of massive multiparametric datasets. 
