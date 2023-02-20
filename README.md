@@ -11,7 +11,7 @@ Hourglass is a toolkit to interrogate multiparameteric data. This desktop applic
 
 > Note: R must be installed for the application to work, but working knowledge of R programming is not necessary. 
 
-2. Download file (see table below). Click on link and press file name to download.
+2. Download file below. Click on link and press file name to download.
 
   | Operating System | Download Link | Size | Latest Version | 
   |:-:|:-:|:-:|:-:| 
