@@ -7,7 +7,7 @@ Hourglass is a toolkit to interrogate multiparameteric data. This desktop applic
 
 ### Installation
 
-1. If not already installed, install the R statistical environment. Refer to this [URL](https://kazeera.github.io/Hourglass/installation.html) to get R.
+1. If not already installed, install the R statistical environment. Refer to this [URL to get R](https://kazeera.github.io/Hourglass/installation.html).
 
 > Note: R must be installed for the application to work, but working knowledge of R programming is not necessary. 
 
@@ -16,7 +16,7 @@ Hourglass is a toolkit to interrogate multiparameteric data. This desktop applic
   | Operating System | Download Link | Size | Latest Version | 
   |:-:|:-:|:-:|:-:| 
   | Windows | [*.exe* file ](https://github.com/kazeera/Hourglass-interface/tree/main/Executables/Windows) | 108 MB | v1.03 | 
-  | MacOS | [*.dmg* file ](https://github.com/kazeera/Hourglass-interface/tree/main/Executables/MacOS) | 53 KB | v1.03 | 
+  | MacOS | [*.dmg* file ](https://github.com/kazeera/Hourglass-interface/tree/main/Executables/MacOS) | 53 MB | v1.03 | 
 
 **Windows**  
 
@@ -32,7 +32,7 @@ Hourglass is a toolkit to interrogate multiparameteric data. This desktop applic
 
 ### How to Use
 
-Open application and follow tabs on top (left to right) to go through workflow. Refer to the complete guide: [URL](https://kazeera.github.io/Hourglass/how-to-use-the-desktop-application.html).
+Open application and follow tabs on top (left to right) to go through workflow. Refer to the [complete guide - URL](https://kazeera.github.io/Hourglass/how-to-use-the-desktop-application.html).
 
 ### Preview
 Easily **accessible** for non-expert users.
