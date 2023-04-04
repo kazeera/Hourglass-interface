@@ -1,0 +1,124 @@
+I'm here: https://docs.github.com/en/repositories/working-with-files/managing-large-files/configuring-git-large-file-storage
+need to use Git LFS for files >25MB *mine is 250 MB
+
+i. Make a new folder to make exe called "HourglassApp-build"
+It will make the exe using source files in folder called HourglassApp has the files main.py, functions.py, hourglass.kv
+* note use pyinstaller  version 3.5, Jul 9, 2019 before hooks
+
+1) > cd ../HourglassApp-build
+2) > python -m PyInstaller --onefile -w --name "Hourglass" "C:\Users\Khokha lab\Documents\Github\HourglassApp\main.py"
+3) edit spec file "exe" command according to https://kivy.org/doc/stable/guide/packaging-windows.html OR look at end of this txt file
+4) > python -m PyInstaller Hourglass.spec
+5) need to copy and paste hourglass.kv, dataset2.pkl, Icons/hourglass.gif into the final dist for it to work.. according to https://stackoverflow.com/questions/41441123/package-a-kivy-app-into-one-single-exe
+6) run HourglassApp.exe	
+
+ii. How to make distributor
+Option 1 (easy and good) - How to make installer
+use Inno Setup
+see https://www.youtube.com/watch?v=l1p2GQxcP54&ab_channel=NikhilTech
+1) Download Inno
+2) Open Inno Setup Compiler on your computer
+3) File > New > Next
+4) Application name: Hourglass, version: 1.01, Application publisher: Rama Khokha Lab, website: https://kazeera.github.io/Hourglass/
+5) Next > Application main executable  (brown and find it), Add folder with dependencies, > Unchcck assocaita
+
+Option 2
+7) make dist file into a .zip folder, rename to whatever you want "hourglass1"
+8) open NSIS and under "Compiler" heading, click Installer based on .zip file
+9) Put in path to .zip file and make hourglass1.exe that you can send to colleagues
+
+
+Git
+1)
+2) Follow commands - https://docs.github.com/en/repositories/working-with-files/managing-large-files/configuring-git-large-file-storage
+git lfs track "*.exe"
+git add "Executables/Hourglass setup.exe"
+git commit -m "Add installer exe"
+git push
+
+Info:	
+Uploading LFS objects: 100% (1/1), 111 MB | 48 MB/s, done.
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 444 bytes | 444.00 KiB/s, done.
+
+
+todo
+- add icon based on link in 3)
+- add R files to dist folder so dependencies+R download with exe
+- for Henry https://kivy.org/doc/stable/guide/packaging-osx.html
+- exe on web? https://www.quora.com/How-can-a-exe-file-be-run-online
+--------------
+Notes from:
+https://www.youtube.com/watch?v=t51bT7WbeCM
+1) pyinstaller --onefile -w main.py
+--onefile is just for one file in dist (incl dependencies)
+-w is to prevent terminal from popping up
+https://www.youtube.com/watch?v=t51bT7WbeCM
+2) convert to .zip
+3) use NSIS to install based on .zip file 
+
+
+
+-----
+HourglassApp.spec file - lines to add start with ">"
+
+# -*- mode: python ; coding: utf-8 -*-
+> from kivy_deps import sdl2, glew
+> from kivy.tools.packaging.pyinstaller_hooks import get_deps_minimal, get_deps_all, hookspath, runtime_hooks
+
+block_cipher = None
+
+
+a = Analysis(
+    ['C:\\Users\\Khokha lab\\Documents\\Github\\HourglassApp\\main.py'],
+    pathex=[],
+    binaries=[],
+    datas=[],
+    hiddenimports=[],
+    hooksconfig={},
+>    hookspath=hookspath(),
+>    runtime_hooks=runtime_hooks(),
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+>    **get_deps_minimal(video=None, audio=None) # **get_deps_all()
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+> exe = EXE(pyz, Tree('C:\\Users\\Khokha lab\\Documents\\Github\\HourglassApp\\'),
+          a.scripts,
+          a.binaries,
+          a.zipfiles,
+          a.datas,  
+>          *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
+          name='HourglassApp',
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          upx=True,
+          upx_exclude=[],
+          runtime_tmpdir=None,
+          console=False,
+          disable_windowed_traceback=False,
+          target_arch=None,
+          codesign_identity=None,
+          entitlements_file=None, 
+>          icon='C:\\Users\\Khokha lab\\Documents\\GitHub\\Hourglass-interface\\Logo\\Hourglass_logo-removebg.ico'
+)
+
+
+> all the below
+coll = COLLECT(exe, Tree('C:\\Users\\Khokha lab\\Documents\\Github\\HourglassApp\\'),
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
+               strip=False,
+               upx=True,
+               name='HourglassApp')

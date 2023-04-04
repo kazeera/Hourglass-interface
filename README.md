@@ -1,11 +1,29 @@
 # Hourglass (Desktop Application)
 
+<<<<<<< Updated upstream
 <img src="Logo/Hourglass_logo-removebg.png?raw=true" alt="Hourglass logo" width="60"></img>
 
 Hourglass is a toolkit to interrogate multiparameteric data. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
 
 
 ### Installation
+=======
+This application serves as a graphical user interface to the R package, Hourglass, found [here](https://github.com/kazeera/Hourglass/).
+It is a standalone desktop application supported by python and Kivy design language.
+  
+See installation instructions below. Refer to the complete guide for more instructions [Hourglass Documentation](https://github.com/kazeera/Hourglass-documentation/).
+
+### Installation
+
+1. Download installer file (see table below).
+2. Locate downloaded installer file on your computer.
+3. Double click file called Hourglass setup.exe to run installer (Windows). When you open this file Windows will run a setup wizard to install Hourglass.
+
+  | Operating System | Download Link | Size | Latest Version |
+  |:-|:-|:-|
+  | Windows | [*.exe* file ](https://github.com/kazeera/Hourglass-interface/tree/main/Executables/Windows) | 108 MB | v1.03 |
+  | MacOS | [*.dmg* file ](https://github.com/kazeera/Hourglass-interface/tree/main/Executables/MacOS) | 53 KB | v1.03 | 
+>>>>>>> Stashed changes
 
 1. If not already installed, install the R statistical environment. Refer to this [URL to get R](https://kazeera.github.io/Hourglass/installation.html).
 
