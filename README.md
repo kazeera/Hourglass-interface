@@ -4,13 +4,6 @@
 
 Hourglass is a toolkit to interrogate multiparameteric data. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
 
-
-### Installation
-This application serves as a graphical user interface to the R package, Hourglass, found [here](https://github.com/kazeera/Hourglass/).
-It is a standalone desktop application supported by python and Kivy design language.
-  
-See installation instructions below. Refer to the complete guide for more instructions [Hourglass Documentation](kazeera.github.io/Hourglass).
-
 ### Installation
 
 1. Download installer file (see table below).
