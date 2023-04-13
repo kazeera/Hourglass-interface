@@ -2,7 +2,7 @@
 
 <img src="Logo/Hourglass_logo-removebg.png?raw=true" alt="Hourglass logo" width="60"></img>
 
-Hourglass is a toolkit to interrogate multiparameteric data. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. 
+Hourglass is a toolkit to interrogate multiparameteric data. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. See [user's guide](https://kazeera.github.io/Hourglass/index.html).
 
 ### Installation
 
