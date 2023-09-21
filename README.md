@@ -1,4 +1,5 @@
 # Hourglass (Desktop Application)
+[![DOI](https://zenodo.org/badge/397323448.svg)](https://zenodo.org/badge/latestdoi/397323448)
 
 <img src="Logo/Hourglass_logo-removebg.png?raw=true" alt="Hourglass logo" width="60"></img>
 
