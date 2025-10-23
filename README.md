@@ -1,15 +1,14 @@
 # Hourglass (Desktop Application)
-[![DOI](https://zenodo.org/badge/397323448.svg)](https://zenodo.org/badge/latestdoi/397323448)
 
 <img src="Logo/Hourglass_logo-removebg.png?raw=true" alt="Hourglass logo" width="60"></img>
 
-Hourglass is a toolkit to interrogate multiparameteric data. This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using python and the Kivy design language. See [user's guide](https://kazeera.github.io/Hourglass/index.html).
+Hourglass is a toolkit to interrogate multiparametric data - manuscript [here](https://pathsocjournals.onlinelibrary.wiley.com/doi/10.1002/path.6199). This desktop application serves as a graphical user interface for the R package with the same name, found [here](https://github.com/kazeera/Hourglass/). It was built using Python and the Kivy design language. See [user's guide](https://kazeera.github.io/Hourglass/index.html).
 
 ### Installation
 
-1. Download installer file (see table below).
-2. Locate downloaded installer file on your computer.
-3. Double click file called Hourglass setup.exe to run installer (Windows). When you open this file Windows will run a setup wizard to install Hourglass.
+1. Download the installer file (see table below).
+2. Locate the downloaded installer file on your computer.
+3. Double the click file called Hourglass setup.exe to run the installer (Windows). When you open this file, Windows will run a setup wizard to install Hourglass.
 
 1. If not already installed, install the R statistical environment. Refer to this [URL to get R](https://kazeera.github.io/Hourglass/installation.html).
 
@@ -36,7 +35,7 @@ Hourglass is a toolkit to interrogate multiparameteric data. This desktop applic
 
 ### How to Use
 
-Open application and follow tabs on top (left to right) to go through workflow. Refer to the [complete guide - URL](https://kazeera.github.io/Hourglass/how-to-use-the-desktop-application.html).
+Open application and follow tabs on top (left to right) to go through the workflow. Refer to the [complete guide - URL](https://kazeera.github.io/Hourglass/how-to-use-the-desktop-application.html).
 
 ### Preview
 Easily **accessible** for non-expert users.
@@ -68,10 +67,10 @@ It was used to integrate quantified image analysis output with clinical data fro
 - Facilitates fully reproducible data exploration for non-expert users
 - Leverages metrics of heterogeneity from standard TMA designs:
   - Resolves regional (sample-level) vs global (patient-level) differences
-  - Allows definitions for exclusion/inclusion criteria (ie. filters), within subgroups, e.g. exclude Smokers
+  - Allows definitions for exclusion/inclusion criteria (i.e. filters), within subgroups, e.g. exclude Smokers
   - Uses internal data to stratify patients/samples, e.g. expression of a gene can group cohorts into low/high subgroups
-  - Option to impute dropouts and run imputed dataset in parallel, particularly useful for patchy datasets
-- Proposes method of quality control by providing boxplots for all feature/parameter combinations
-- Creates publication-ready plots in semi-automated manner in organized file hierarchy
+  - Option to impute dropouts and run the imputed dataset in parallel, particularly useful for patchy datasets
+- Proposes a method of quality control by providing boxplots for all feature/parameter combinations
+- Creates publication-ready plots in a semi-automated manner in an organized file hierarchy
 - Generic input design supports any type of numerical dataset with clinical/sample annotations, including omics data
 
